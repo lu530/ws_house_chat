@@ -1,0 +1,23 @@
+2023-07-12 18:00:56 -Starting ServiceApplication on BM-202104081412 with PID 32164 (D:\JideaWorkspace\ws_house_chat\hs_chat_service\target\classes started by admin in D:\JideaWorkspace\ws_house_chat)
+2023-07-12 18:00:56 -The following profiles are active: dev
+2023-07-12 18:01:00 -Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-07-12 18:01:00 -Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-07-12 18:01:00 -Finished Spring Data repository scanning in 48ms. Found 0 repository interfaces.
+2023-07-12 18:01:01 -Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration$$EnhancerBySpringCGLIB$$eaab1588] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-07-12 18:01:02 -Tomcat initialized with port(s): 8080 (http)
+2023-07-12 18:01:02 -Initializing ProtocolHandler ["http-nio-8080"]
+2023-07-12 18:01:02 -Starting service [Tomcat]
+2023-07-12 18:01:02 -Starting Servlet engine: [Apache Tomcat/9.0.22]
+2023-07-12 18:01:03 -Initializing Spring embedded WebApplicationContext
+2023-07-12 18:01:03 -Root WebApplicationContext: initialization completed in 5961 ms
+2023-07-12 18:01:06 -Mapped URL path [/v2/api-docs] onto method [public org.springframework.http.ResponseEntity<springfox.documentation.spring.web.json.Json> springfox.documentation.swagger2.web.Swagger2Controller.getDocumentation(java.lang.String,javax.servlet.http.HttpServletRequest)]
+2023-07-12 18:01:06 -Starting Swagger*****
+2023-07-12 18:01:06 -title: ws chat API管理, groupName:ws chat API
+2023-07-12 18:01:06 -title: ws chat API管理, groupName:ws chat API
+2023-07-12 18:01:06 -Started Swagger in 25 ms
+2023-07-12 18:01:07 -Context refreshed
+2023-07-12 18:01:07 -Found 1 custom documentation plugin(s)
+2023-07-12 18:01:07 -Scanning for api listing references
+2023-07-12 18:01:07 -Starting ProtocolHandler ["http-nio-8080"]
+2023-07-12 18:01:07 -Tomcat started on port(s): 8080 (http) with context path ''
+2023-07-12 18:01:07 -Started ServiceApplication in 14.226 seconds (JVM running for 21.669)

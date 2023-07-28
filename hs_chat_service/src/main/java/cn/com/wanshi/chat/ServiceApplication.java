@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @SpringBootApplication(scanBasePackages = {"cn.com.wanshi.chat"})
 @EnableTransactionManagement
-@MapperScan("cn.com.wanshi.chat.*.dao.mapper")
+@MapperScan("cn.com.wanshi.chat.*.mapper")
 public class ServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(ServiceApplication.class, args);

@@ -1,6 +1,7 @@
 package cn.com.wanshi.chat.user.model.resp;
 
-import cn.com.wanshi.chat.user.dao.ImUserDataEntity;
+import cn.com.wanshi.chat.user.entity.ImUserData;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -9,7 +10,10 @@ import lombok.Data;
  * @time 13:32
  */
 @Data
-public class UserInfoResp extends ImUserDataEntity {
+public class UserInfoResp extends ImUserData {
+
+    @ApiModelProperty(value = "登录令牌")
+    private String token;
 
 
 }

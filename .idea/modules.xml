@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/hs_chat_service.iml" filepath="$PROJECT_DIR$/hs_chat_service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hs_common.iml" filepath="$PROJECT_DIR$/hs_common.iml" />
     </modules>
   </component>
 </project>

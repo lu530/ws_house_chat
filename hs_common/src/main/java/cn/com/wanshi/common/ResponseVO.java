@@ -22,9 +22,9 @@ import lombok.NoArgsConstructor;
 @SuppressWarnings("all")
 public class ResponseVO<T> {
     // 状态码
-    private int code;
+    private int status;
 
-    private String msg;
+    private String message;
 
     private T data;
 
@@ -49,25 +49,25 @@ public class ResponseVO<T> {
     }
 
     public boolean isOk(){
-        return this.code == 200;
+        return this.status == 200;
     }
 
 
     public ResponseVO(int code, String msg) {
-        this.code = code;
-        this.msg = msg;
+        this.status = code;
+        this.message = msg;
 //		this.data = null;
     }
 
     public ResponseVO success(){
-        this.code = 200;
-        this.msg = "success";
+        this.status = 200;
+        this.message = "success";
         return this;
     }
 
     public ResponseVO success(T data){
-        this.code = 200;
-        this.msg = "success";
+        this.status = 200;
+        this.message = "success";
         this.data = data;
         return this;
     }

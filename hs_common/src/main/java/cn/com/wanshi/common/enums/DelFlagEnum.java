@@ -1,5 +1,9 @@
 package cn.com.wanshi.common.enums;
 
+/**
+ * @author zzc
+ */
+
 public enum DelFlagEnum {
 
     /**

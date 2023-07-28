@@ -1,6 +1,11 @@
 server:
   port: 8080
 spring:
+  mail:
+    host: smtp.qq.com
+    username: xiaoerzzc@qq.com
+    password: dqgkuvkfiuzoheac
+    default-encoding: UTF-8
   profiles:
     active: dev
   datasource:
@@ -19,3 +24,7 @@ spring:
         min-idle: 10
     password: 123456
     database: 0
+
+#mybatis-plus:
+      #  mapper-locations:
+#    - classpath:mapper/**/*.xml

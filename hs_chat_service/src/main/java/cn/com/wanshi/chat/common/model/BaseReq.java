@@ -1,5 +1,6 @@
 package cn.com.wanshi.chat.common.model;
 
+import cn.com.wanshi.chat.user.entity.ImUserData;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -19,6 +20,10 @@ public class BaseReq {
 
     @ApiModelProperty(value = "用户ID")
     private String userId;
+
+
+    @ApiModelProperty(value = "用户数据")
+    private ImUserData imUserData;
 
 
 }

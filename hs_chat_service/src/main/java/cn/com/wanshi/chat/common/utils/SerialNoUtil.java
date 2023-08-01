@@ -6,6 +6,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
+import org.springframework.stereotype.Component;
 
 import java.text.DecimalFormat;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,9 +16,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p>
  * 取序列号类
  */
+@Component
 public class SerialNoUtil implements InitializingBean {
     private static volatile AtomicInteger atomicInteger = new AtomicInteger(0);
-    private static String mac;
+    private static String mac ;
     private static ThreadLocal<DecimalFormat> threadLocal = ThreadLocal.withInitial(()-> new DecimalFormat("00000"));
     @Autowired
     private StringRedisTemplate redisTemplate;

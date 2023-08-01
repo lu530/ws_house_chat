@@ -8,6 +8,7 @@ import cn.com.wanshi.chat.user.mapper.ImUserDataMapper;
 import cn.com.wanshi.chat.user.model.req.*;
 import cn.com.wanshi.chat.user.model.resp.UserInfoResp;
 import cn.com.wanshi.chat.user.service.IImUserDataService;
+import cn.com.wanshi.chat.user.service.IImUserTokenService;
 import cn.com.wanshi.common.ResponseVO;
 import cn.com.wanshi.common.enums.DelFlagEnum;
 import cn.com.wanshi.common.enums.ReceiptCodeTypeEnum;
@@ -21,21 +22,17 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import cn.com.wanshi.chat.user.service.IImUserTokenService;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * <p>
@@ -139,7 +136,7 @@ public class ImUserDataServiceImpl extends ServiceImpl<ImUserDataMapper, ImUserD
         LambdaQueryWrapper<ImUserData> emailQueryWrapper = new LambdaQueryWrapper();
         emailQueryWrapper.eq(ImUserData::getEmail, req.getEmail());
         emailQueryWrapper.eq(ImUserData::getDelFlag, DelFlagEnum.NORMAL.getCode());
-        ImUserData emailOne = this.getOne(queryWrapper);
+        ImUserData emailOne = this.getOne(emailQueryWrapper);
         Assert.isTrue(emailOne == null,"该邮箱已经注册");
 
 
@@ -171,6 +168,15 @@ public class ImUserDataServiceImpl extends ServiceImpl<ImUserDataMapper, ImUserD
         one.setPassword(md5Encode);
         this.update(one, queryWrapper);
         return ResponseVO.successResponse(true);
+    }
+
+    @Override
+    public ImUserData getUserInfoByUserId(String userId) {
+        LambdaQueryWrapper<ImUserData> queryWrapper = new LambdaQueryWrapper();
+        queryWrapper.eq(ImUserData::getUserId, userId);
+        queryWrapper.eq(ImUserData::getDelFlag, DelFlagEnum.NORMAL.getCode());
+        ImUserData one = this.getOne(queryWrapper);
+        return one;
     }
 
 

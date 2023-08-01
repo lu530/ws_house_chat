@@ -50,4 +50,11 @@ public interface IImUserDataService extends IService<ImUserData> {
      * @return
      */
     ResponseVO<Boolean> reSetPassWord(ReSetPassWordReq req);
+
+    /**
+     * 根据userId获取用户数据
+     * @param userId
+     * @return
+     */
+    ImUserData getUserInfoByUserId(String userId);
 }

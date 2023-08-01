@@ -5,9 +5,11 @@ import cn.com.wanshi.chat.common.utils.RedisUtil;
 import cn.com.wanshi.chat.common.utils.SerialNoUtil;
 import cn.com.wanshi.chat.user.entity.ImUserToken;
 import cn.com.wanshi.chat.user.mapper.ImUserTokenMapper;
+import cn.com.wanshi.chat.user.model.resp.UserInfoResp;
 import cn.com.wanshi.chat.user.service.IImUserTokenService;
 import cn.com.wanshi.common.enums.YesNoEnum;
 import cn.com.wanshi.common.redis.RedisRepository;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +50,7 @@ public class ImUserTokenServiceImpl extends ServiceImpl<ImUserTokenMapper, ImUse
                 return userToken;
             }
         }
-        // 创建token
+        // 创建token;
         String token = userId  + System.currentTimeMillis();
         //生产token
         token = MD5Implementor.MD5Encode(token);
@@ -67,6 +69,17 @@ public class ImUserTokenServiceImpl extends ServiceImpl<ImUserTokenMapper, ImUse
         redisUtil.set(token,com.alibaba.fastjson.JSONObject.toJSONString(pojo),USER_TOKEN.getTimeout());
         this.save(pojo);
         return token;
+    }
+
+    @Override
+    public ImUserToken checkToken(String token) {
+        //判断是否存在MallUserToken缓存
+        String obj = (String) redisUtil.get(token);
+        if(obj != null){
+            ImUserToken imUserToken = JSONObject.parseObject(obj, ImUserToken.class);
+            return imUserToken;
+        }
+        return null;
     }
 
 }

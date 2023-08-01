@@ -1,6 +1,7 @@
 package cn.com.wanshi.chat.user.service;
 
 import cn.com.wanshi.chat.user.entity.ImUserToken;
+import cn.com.wanshi.chat.user.model.resp.UserInfoResp;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -15,4 +16,5 @@ public interface IImUserTokenService extends IService<ImUserToken> {
 
     String createToken(String userId, String clientType, String cuid);
 
+    ImUserToken checkToken(String token);
 }

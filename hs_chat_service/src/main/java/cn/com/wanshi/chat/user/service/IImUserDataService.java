@@ -1,10 +1,14 @@
 package cn.com.wanshi.chat.user.service;
 
+import cn.com.wanshi.chat.user.model.req.FindUserInfoReq;
 import cn.com.wanshi.chat.user.entity.ImUserData;
 import cn.com.wanshi.chat.user.model.req.*;
+import cn.com.wanshi.chat.user.model.resp.FindUserInfoResp;
 import cn.com.wanshi.chat.user.model.resp.UserInfoResp;
 import cn.com.wanshi.common.ResponseVO;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -57,4 +61,19 @@ public interface IImUserDataService extends IService<ImUserData> {
      * @return
      */
     ImUserData getUserInfoByUserId(String userId);
+
+    /**
+     * 根据用户输入信息查找用户
+     * @param req
+     * @return
+     */
+    ResponseVO<FindUserInfoResp> findUserInfo(FindUserInfoReq req);
+
+
+    /**
+     *
+     * @param userIds
+     * @return
+     */
+    List<ImUserData> getUsersByUserIds(List<String> userIds);
 }

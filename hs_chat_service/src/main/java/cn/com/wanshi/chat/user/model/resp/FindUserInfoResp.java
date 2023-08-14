@@ -1,32 +1,23 @@
-package cn.com.wanshi.chat.user.entity;
+package cn.com.wanshi.chat.user.model.resp;
 
+import cn.com.wanshi.chat.user.entity.ImUserData;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
-import java.io.Serializable;
-import java.util.Date;
-
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
+
+import java.util.Date;
 
 /**
- * <p>
- * 用户信息表
- * </p>
- *
- * @author zzc
- * @since 2023-07-19
+ * @author zhongzhicheng
+ * @data 2023/7/5
+ * @time 13:32
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
-@ApiModel(value="ImUserData对象", description="用户信息表")
-public class ImUserData implements Serializable {
+public class FindUserInfoResp {
 
-    private static final long serialVersionUID = 1L;
+    @ApiModelProperty(value = " 0未请求 1同意 2拒绝 3 请求中 4 已经过期")
+    private Integer approveStatus;
 
     @ApiModelProperty(value = "主键")
     @TableId(value = "id", type = IdType.AUTO)
@@ -54,8 +45,7 @@ public class ImUserData implements Serializable {
     @ApiModelProperty(value = "生日")
     private Date birthDay;
 
-    @ApiModelProperty(value = "密码")
-    private String password;
+
 
     @ApiModelProperty(value = "头像url")
     private String photo;
@@ -81,14 +71,5 @@ public class ImUserData implements Serializable {
     @ApiModelProperty(value = "用户类型 1普通用户 2客服 3机器人")
     private Integer userType;
 
-    @ApiModelProperty(value = "是否删除 1是 0否")
-    private Integer delFlag;
-
-
-    @ApiModelProperty(value = "生成时间")
-    private Date createTime;
-
-    @ApiModelProperty(value = "更新时间")
-    private Date updateTime;
 
 }

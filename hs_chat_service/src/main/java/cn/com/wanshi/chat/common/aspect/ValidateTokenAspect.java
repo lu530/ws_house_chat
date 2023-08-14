@@ -3,23 +3,19 @@ package cn.com.wanshi.chat.common.aspect;
 
 import cn.com.wanshi.chat.common.annotation.ValidateToken;
 import cn.com.wanshi.chat.common.model.BaseReq;
-import cn.com.wanshi.chat.common.utils.RedisUtil;
 import cn.com.wanshi.chat.user.entity.ImUserData;
 import cn.com.wanshi.chat.user.entity.ImUserToken;
-import cn.com.wanshi.chat.user.model.resp.UserInfoResp;
 import cn.com.wanshi.chat.user.service.IImUserDataService;
 import cn.com.wanshi.chat.user.service.IImUserTokenService;
 import cn.com.wanshi.common.ResponseVO;
 import cn.com.wanshi.common.enums.ApiCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.MDC;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
@@ -47,10 +43,7 @@ public class ValidateTokenAspect {
     private IImUserTokenService iImUserTokenService;
 
 
-
-
-
-    @Around("@annotation(cn.com.bluemoon.commons.annotation.ValidateToken)")
+    @Around("@annotation(cn.com.wanshi.chat.common.annotation.ValidateToken)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         assert requestAttributes != null;

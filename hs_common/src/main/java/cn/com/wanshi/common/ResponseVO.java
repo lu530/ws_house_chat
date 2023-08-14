@@ -12,6 +12,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * 公共返回实体类
  */
@@ -20,7 +22,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuppressWarnings("all")
-public class ResponseVO<T> {
+public class ResponseVO<T> implements Serializable {
     // 状态码
     private int status;
 
@@ -70,6 +72,15 @@ public class ResponseVO<T> {
         this.message = "success";
         this.data = data;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "ResponseVO{" +
+                "status=" + status +
+                ", message='" + message + '\'' +
+                ", data=" + data +
+                '}';
     }
 }
 

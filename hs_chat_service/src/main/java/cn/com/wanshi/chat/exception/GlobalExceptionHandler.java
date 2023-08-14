@@ -79,7 +79,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = BindException.class)
     @ResponseBody
-    public Object  handleException2(BindException ex) {
+    public Object  bindException(BindException ex) {
         FieldError err = ex.getFieldError();
         String message = "参数{".concat(err.getField()).concat("}").concat(err.getDefaultMessage());
         ResponseVO resultBean =new ResponseVO();
@@ -93,7 +93,7 @@ public class GlobalExceptionHandler {
     //json格式
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     @ResponseBody
-    public Object  handleException1(MethodArgumentNotValidException ex) {
+    public Object  methodArgumentNotValidException(MethodArgumentNotValidException ex) {
         StringBuilder errorMsg = new StringBuilder();
         BindingResult re = ex.getBindingResult();
         for (ObjectError error : re.getAllErrors()) {

@@ -3,9 +3,11 @@ package cn.com.wanshi.chat.user.service.impl;
 import cn.com.wanshi.chat.common.utils.MD5Implementor;
 import cn.com.wanshi.chat.common.utils.SerialNoUtil;
 import cn.com.wanshi.chat.common.utils.VerifyCodeUtil;
+import cn.com.wanshi.chat.user.model.req.FindUserInfoReq;
 import cn.com.wanshi.chat.user.entity.ImUserData;
 import cn.com.wanshi.chat.user.mapper.ImUserDataMapper;
 import cn.com.wanshi.chat.user.model.req.*;
+import cn.com.wanshi.chat.user.model.resp.FindUserInfoResp;
 import cn.com.wanshi.chat.user.model.resp.UserInfoResp;
 import cn.com.wanshi.chat.user.service.IImUserDataService;
 import cn.com.wanshi.chat.user.service.IImUserTokenService;
@@ -32,7 +34,11 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+
+import static cn.com.wanshi.common.enums.ApiCode.USER_NO_FIND;
 
 /**
  * <p>
@@ -147,6 +153,9 @@ public class ImUserDataServiceImpl extends ServiceImpl<ImUserDataMapper, ImUserD
         String md5Encode = MD5Implementor.MD5Encode(req.getPassword());
         imUserDate.setPassword(md5Encode);
         imUserDate.setUserId("U"+ SerialNoUtil.getUNID());
+        Date now = new Date();
+        imUserDate.setCreateTime(now);
+        imUserDate.setUpdateTime(now);
         this.save(imUserDate);
         return ResponseVO.successResponse(true);
     }
@@ -177,6 +186,33 @@ public class ImUserDataServiceImpl extends ServiceImpl<ImUserDataMapper, ImUserD
         queryWrapper.eq(ImUserData::getDelFlag, DelFlagEnum.NORMAL.getCode());
         ImUserData one = this.getOne(queryWrapper);
         return one;
+    }
+
+    @Override
+    public ResponseVO<FindUserInfoResp> findUserInfo(FindUserInfoReq req) {
+        LambdaQueryWrapper<ImUserData> queryWrapper = new LambdaQueryWrapper();
+        if(Validator.isEmail(req.getAccountWords())){
+            queryWrapper.eq(ImUserData::getEmail, req.getAccountWords());
+        }else{
+            queryWrapper.eq(ImUserData::getAccount, req.getAccountWords());
+        }
+        queryWrapper.eq(ImUserData::getDelFlag, DelFlagEnum.NORMAL.getCode());
+        ImUserData one = this.getOne(queryWrapper);
+        if(Objects.isNull(one)){
+            return ResponseVO.errorResponse(USER_NO_FIND.getValue(), USER_NO_FIND.getMessage());
+        }
+
+        FindUserInfoResp resp = new FindUserInfoResp();
+        BeanUtils.copyProperties(one, resp);
+        return ResponseVO.successResponse(resp);
+    }
+
+    @Override
+    public List<ImUserData> getUsersByUserIds(List<String> userIds) {
+        LambdaQueryWrapper<ImUserData> queryWrapper = new LambdaQueryWrapper();
+        queryWrapper.in(ImUserData::getUserId, userIds);
+        queryWrapper.eq(ImUserData::getDelFlag, DelFlagEnum.NORMAL.getCode());
+        return this.list(queryWrapper);
     }
 
 

@@ -864,5 +864,17 @@ public class DateUtil {
         return dayEnd.getTime();  
     }
 
+    /**
+     * 獲取两个日期相差多少天
+     */
+    public static Integer getDaysBetween(Date bigate, Date littleDate){
+        Calendar aCalendar = Calendar.getInstance();
+        aCalendar.setTime(bigate);
+        int day1 = aCalendar.get(Calendar.DAY_OF_YEAR);
+        aCalendar.setTime(littleDate);
+        int day2 = aCalendar.get(Calendar.DAY_OF_YEAR);
+        return day1 - day2;
+    }
+
 }
 

@@ -22,7 +22,7 @@ public class BaseReq {
     private String userId;
 
 
-    @ApiModelProperty(value = "用户数据")
+    @ApiModelProperty(value = "用户数据", hidden = true)
     private ImUserData imUserData;
 
 

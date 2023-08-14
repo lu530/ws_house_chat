@@ -1,10 +1,11 @@
 package cn.com.wanshi.chat.user.controller;
 
 
+import cn.com.wanshi.chat.user.model.req.FindUserInfoReq;
 import cn.com.wanshi.chat.user.model.req.*;
+import cn.com.wanshi.chat.user.model.resp.FindUserInfoResp;
 import cn.com.wanshi.chat.user.model.resp.UserInfoResp;
 import cn.com.wanshi.common.ResponseVO;
-import com.alibaba.fastjson.JSONPObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,16 @@ public class ImUserDataController {
         ResponseVO<UserInfoResp> result = imUserService.getUserInfo(req);
         return result;
     }
+
+
+    @ApiOperation("根据用户输入信息查找用户")
+    @PostMapping("/findUserInfo")
+    public ResponseVO<FindUserInfoResp> findUserInfo(@RequestBody @Validated FindUserInfoReq req){
+        ResponseVO<FindUserInfoResp> result = imUserService.findUserInfo(req);
+        return result;
+    }
+
+
 
 
     @ApiOperation("用户登录")

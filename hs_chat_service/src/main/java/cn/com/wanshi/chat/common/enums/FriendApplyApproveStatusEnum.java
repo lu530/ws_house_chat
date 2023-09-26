@@ -11,7 +11,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum FriendApplyApproveStatusEnum {
-
+    /**
+     * 请求中
+     */
+    APPLY("申请", 0),
     /**
      * 同意
      */

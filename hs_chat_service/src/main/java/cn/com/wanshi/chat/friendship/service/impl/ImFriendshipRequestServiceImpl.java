@@ -25,6 +25,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -53,7 +54,7 @@ public class ImFriendshipRequestServiceImpl extends ServiceImpl<ImFriendshipRequ
      * @return
      */
     @Override
-    @ValidateToken
+    @Transactional
     public ResponseVO<FriendRequestResp> friendRequest(@RequestBody @Validated FriendRequestReq req) {
         LambdaQueryWrapper<ImFriendshipRequest> lqw = new LambdaQueryWrapper<>();
         lqw.eq(ImFriendshipRequest::getFromId, req.getUserId());
@@ -88,6 +89,7 @@ public class ImFriendshipRequestServiceImpl extends ServiceImpl<ImFriendshipRequ
         LambdaQueryWrapper<ImFriendshipRequest> lqw = new LambdaQueryWrapper<>();
         lqw.eq(ImFriendshipRequest::getToId, req.getUserId());
         lqw.eq(ImFriendshipRequest::getReadStatus, req.getReadStatus());
+        lqw.eq(ImFriendshipRequest::getApproveStatus, FriendApplyApproveStatusEnum.APPLY.value);
         int count = this.count(lqw);
         return ResponseVO.successResponse(FriendRequestCountResp.builder().count(count).build());
     }
@@ -110,6 +112,7 @@ public class ImFriendshipRequestServiceImpl extends ServiceImpl<ImFriendshipRequ
             resp.setRequsetFrom(RequsetFromEnum.FROM_OTHER.value);
             resp.setUserId(item.getFromId());
             userIdList.add(item.getFromId());
+            resp.setFriendshipRequestId(item.getId());
             return resp;
         }).collect(Collectors.toList());
 
@@ -139,6 +142,10 @@ public class ImFriendshipRequestServiceImpl extends ServiceImpl<ImFriendshipRequ
                 (existing, replacement) -> existing));
 
         /**
+         * TODO拉黑的
+         */
+
+        /**
          * 好友信息整合  & 进三天 分类
          */
         Date now = new Date();
@@ -150,6 +157,7 @@ public class ImFriendshipRequestServiceImpl extends ServiceImpl<ImFriendshipRequ
             ImUserData imUserData = userDateGroupByUserId.get(userId);
             //防止覆盖了 ImFriendshipRequest 的创建时间影响了
             BeanUtils.copyProperties(imUserData, item);
+            item.setFriendshipRequestId(item.getFriendshipRequestId());
             return item;
         }).collect(Collectors.groupingBy(FriendRequestHistoryListResp::getInThreeDayFlay));
 

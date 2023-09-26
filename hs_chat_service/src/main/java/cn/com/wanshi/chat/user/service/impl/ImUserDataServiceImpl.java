@@ -30,6 +30,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -161,6 +162,7 @@ public class ImUserDataServiceImpl extends ServiceImpl<ImUserDataMapper, ImUserD
     }
 
     @Override
+    @Transactional
     public ResponseVO<Boolean> reSetPassWord(ReSetPassWordReq req) {
         LambdaQueryWrapper<ImUserData> queryWrapper = new LambdaQueryWrapper();
         queryWrapper.eq(ImUserData::getEmail, req.getEmail());

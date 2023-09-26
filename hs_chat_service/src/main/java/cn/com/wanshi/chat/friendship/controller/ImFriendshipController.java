@@ -7,6 +7,7 @@ import cn.com.wanshi.chat.friendship.model.resp.FriendAgreeRequestResp;
 import cn.com.wanshi.chat.friendship.service.IImFriendshipService;
 import cn.com.wanshi.common.ResponseVO;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,15 +24,16 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2023-07-29
  */
 @RestController
-@RequestMapping("/im/friendship")
+@RequestMapping("/v1/im/friendship")
 public class ImFriendshipController {
 
 
+    @Autowired
     IImFriendshipService iImFriendshipService;
 
 
     @ApiOperation("同意好友申请")
-    @PostMapping("/friend/agree/apply")
+    @PostMapping("/friend/agree")
     @ValidateToken
     public ResponseVO<FriendAgreeRequestResp> friendAgreeApply(@RequestBody @Validated FriendAgreeRequestReq req){
         ResponseVO<FriendAgreeRequestResp> result = iImFriendshipService.friendAgreeApply(req);

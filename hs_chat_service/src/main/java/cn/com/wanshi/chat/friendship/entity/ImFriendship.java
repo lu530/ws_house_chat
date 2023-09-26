@@ -42,11 +42,20 @@ public class ImFriendship implements Serializable {
     @ApiModelProperty(value = "备注")
     private String remark;
 
+    @ApiModelProperty(value = "好友备注名称")
+    private String friendNickName;
+
     @ApiModelProperty(value = "状态 1正常 2删除")
     private Integer status;
 
     @ApiModelProperty(value = "状态 1正常 2拉黑")
     private Integer black;
+
+    @ApiModelProperty(value = "不让他看我 1 是 0 否")
+    private Integer forbidFromSocialCircle;
+
+    @ApiModelProperty(value = "不看他 1 是 0 否")
+    private Integer forbidToSocialCircle;
 
     @ApiModelProperty(value = "好友关系序列号")
     @TableField("friendSequence")
@@ -58,7 +67,7 @@ public class ImFriendship implements Serializable {
 
     @ApiModelProperty(value = "好友来源")
     @TableField("addSource")
-    private String addSource;
+    private Integer addSource;
 
     @ApiModelProperty(value = "生成时间")
     private Date createTime;

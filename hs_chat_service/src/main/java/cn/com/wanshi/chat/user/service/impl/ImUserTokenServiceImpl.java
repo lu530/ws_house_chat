@@ -55,7 +55,7 @@ public class ImUserTokenServiceImpl extends ServiceImpl<ImUserTokenMapper, ImUse
         //生产token
         token = MD5Implementor.MD5Encode(token);
         // 缓存token,缓存15天
-        redisUtil.set(createTokenRedisKey,token,USER_TOKEN.getTimeout());
+        redisUtil.set(createTokenRedisKey,token,USER_TOKEN.getTimeout(), USER_TOKEN.getUnit());
         ImUserToken pojo = new ImUserToken();
         pojo.setTockenId(SerialNoUtil.getUNID());
         pojo.setToken(token);
@@ -66,7 +66,7 @@ public class ImUserTokenServiceImpl extends ServiceImpl<ImUserTokenMapper, ImUse
         pojo.setCuid(cuid);
 
         // 缓存登录MallUserToken,缓存15天
-        redisUtil.set(token,com.alibaba.fastjson.JSONObject.toJSONString(pojo),USER_TOKEN.getTimeout());
+        redisUtil.set(token,com.alibaba.fastjson.JSONObject.toJSONString(pojo),USER_TOKEN.getTimeout(), USER_TOKEN.getUnit());
         this.save(pojo);
         return token;
     }

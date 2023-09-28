@@ -8,8 +8,12 @@ import cn.com.wanshi.chat.friendship.entity.ImFriendshipRequest;
 import cn.com.wanshi.chat.friendship.mapper.ImFriendshipMapper;
 import cn.com.wanshi.chat.friendship.mapper.ImFriendshipRequestMapper;
 import cn.com.wanshi.chat.friendship.model.req.FriendAgreeRequestReq;
+import cn.com.wanshi.chat.friendship.model.req.FriendsReq;
 import cn.com.wanshi.chat.friendship.model.resp.FriendAgreeRequestResp;
+import cn.com.wanshi.chat.friendship.model.resp.FriendResp;
 import cn.com.wanshi.chat.friendship.service.IImFriendshipService;
+import cn.com.wanshi.chat.user.entity.ImUserData;
+import cn.com.wanshi.chat.user.service.IImUserDataService;
 import cn.com.wanshi.common.ResponseVO;
 import cn.com.wanshi.common.enums.YesNoEnum;
 import cn.hutool.core.lang.Assert;
@@ -20,8 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * <p>
@@ -39,6 +45,8 @@ public class ImFriendshipServiceImpl extends ServiceImpl<ImFriendshipMapper, ImF
     @Autowired
     ImFriendshipRequestMapper imFriendshipRequestMapper;
 
+    @Autowired
+    private IImUserDataService imUserService;
     /**
      * 同意好友添加
      * @param req
@@ -103,6 +111,36 @@ public class ImFriendshipServiceImpl extends ServiceImpl<ImFriendshipMapper, ImF
         imFriendshipRequest.setApproveStatus(FriendApplyApproveStatusEnum.AGREE.getValue());
         imFriendshipRequestMapper.updateById(imFriendshipRequest);
         return ResponseVO.successResponse(FriendAgreeRequestResp.builder().status(YesNoEnum.YES.value).message("保存成功").build());
+    }
+
+    @Override
+    public ResponseVO<List<FriendResp>> friends(FriendsReq req) {
+
+        //接受方好友关系保存
+        LambdaQueryWrapper<ImFriendship> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(ImFriendship::getFromId, req.getUserId());
+        lqw.eq(ImFriendship::getBlack, FriendshipBlackEnum.NORMAL.getValue());
+        lqw.eq(ImFriendship::getStatus, FriendshipStatusEnum.NORMAL.getValue());
+
+        List<ImFriendship> list = this.list(lqw);
+
+        List<String> friendUserIds = list.stream().map(ImFriendship::getToId).collect(Collectors.toList());
+
+        /**
+         * 查询好友用户信息
+         */
+        List<ImUserData> usersByUserIds = imUserService.getUsersByUserIds(new ArrayList<>(friendUserIds));
+        Map<String, ImUserData> userDateGroupByUserId = usersByUserIds.stream().collect(Collectors.toMap(ImUserData::getUserId, Function.identity(),
+                (existing, replacement) -> existing));
+
+        List<FriendResp> collect = list.stream().map(item -> {
+            FriendResp friendResp = new FriendResp();
+            BeanUtils.copyProperties(item, friendResp);
+            ImUserData imUserData = userDateGroupByUserId.get(item.getToId());
+            BeanUtils.copyProperties(imUserData, friendResp);
+            return friendResp;
+        }).collect(Collectors.toList());
+        return ResponseVO.successResponse(collect);
     }
 
 

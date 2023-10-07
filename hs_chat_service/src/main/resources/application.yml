@@ -40,3 +40,7 @@ minio:
   access-key: aOT231p6FCr4uPDhxDeu
   secret-key: sC2j6T91bZU5zZJww6YP2n8T8FQQl3Tt2nWqj4eF
   bucket-name: ws-house-chat-2023
+
+netty:
+  hostname: 127.0.0.1
+  port: 7777

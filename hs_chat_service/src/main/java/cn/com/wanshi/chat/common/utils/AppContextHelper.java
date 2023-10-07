@@ -32,6 +32,9 @@ public class AppContextHelper implements ApplicationContextAware, EnvironmentAwa
         return applicationContext.getBean(clazz);
     }
 
+
+
+
     public static <T> T getBean(String name, Class<T> clazz){
         return applicationContext.getBean(name,clazz);
     }

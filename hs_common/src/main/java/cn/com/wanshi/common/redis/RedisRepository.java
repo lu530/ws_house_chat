@@ -603,7 +603,7 @@ public class RedisRepository {
         //切记这里一定要关闭，否则会耗尽连接数。报Cannot get Jedis connection; nested exception is redis.clients.jedis.exceptions.JedisException: Could not get a
         try {
             cursor.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOGGER.error("scan error: " + e.getLocalizedMessage());
             e.printStackTrace();
         }

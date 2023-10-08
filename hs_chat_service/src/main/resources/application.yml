@@ -42,5 +42,5 @@ minio:
   bucket-name: ws-house-chat-2023
 
 netty:
-  hostname: 127.0.0.1
+  hostname: 10.11.18.41
   port: 7777

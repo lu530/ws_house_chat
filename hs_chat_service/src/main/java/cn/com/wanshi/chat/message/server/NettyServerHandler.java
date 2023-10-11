@@ -1,7 +1,13 @@
 package cn.com.wanshi.chat.message.server;
- 
- 
+
+
 import cn.com.wanshi.chat.common.constants.General;
+import cn.com.wanshi.chat.common.utils.AppContextHelper;
+import cn.com.wanshi.chat.message.model.req.ImMessageReq;
+import cn.com.wanshi.chat.message.model.req.ImMessageResp;
+import cn.com.wanshi.chat.message.service.IImMessageDataService;
+import cn.com.wanshi.common.ResponseVO;
+import com.alibaba.fastjson.JSONObject;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,8 +19,10 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
- 
+import org.apache.commons.lang3.StringUtils;
+
 import java.net.InetSocketAddress;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
  
@@ -27,6 +35,18 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
+
+    IImMessageDataService imMessageDataService;
+
+
+    private IImMessageDataService getIImMessageDataService(){
+        if(Objects.isNull(imMessageDataService)){
+            imMessageDataService = AppContextHelper.getBean(IImMessageDataService.class);
+        }
+        return imMessageDataService;
+    }
+
+
  
  
     //由于继承了SimpleChannelInboundHandler，这个方法必须实现，否则报错
@@ -34,14 +54,17 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     public void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buff = (ByteBuf) msg;
-        String info = buff.toString(CharsetUtil.UTF_8);
-        log.info("收到消息内容：" + info);
+        String strMsg = buff.toString(CharsetUtil.UTF_8);
+        if(StringUtils.isEmpty(strMsg)){
+            ImMessageReq imMessageReq = JSONObject.parseObject(strMsg, ImMessageReq.class);
+        }
+        log.info("收到消息内容：" + strMsg);
     }
  
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         // WebSocket消息处理
-        String strMsg = "123";
+        String strMsg = "";
         if (msg instanceof WebSocketFrame) {
             log.info("WebSocket消息处理************************************************************");
             strMsg = ((TextWebSocketFrame) msg).text().trim();
@@ -54,11 +77,19 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
             strMsg = buff.toString(CharsetUtil.UTF_8).trim();
             log.info("收到socket消息：" + strMsg);
         }
-//        else {
-//            strMsg = msg.toString();
-//        }
+
+        if(!StringUtils.isEmpty(strMsg)){
+            ImMessageReq imMessageReq = JSONObject.parseObject(strMsg, ImMessageReq.class);
+            ResponseVO<ImMessageResp> handler = getIImMessageDataService().handler(imMessageReq, ctx.channel().id());
+            strMsg = JSONObject.toJSONString(handler);
+        }
+
         this.channelWrite(ctx.channel().id(), strMsg);
     }
+
+
+
+
  
     /**
      * 有客户端终止连接服务器会触发此函数
@@ -76,7 +107,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
         if (General.CHANNEL_MAP.containsKey(channelId)) {
             //删除连接
             General.CHANNEL_MAP.remove(channelId);
-            System.out.println();
             log.info("Socket------客户端【" + channelId + "】退出netty服务器[IP:" + clientIp + "--->PORT:" + insocket.getPort() + "]");
             log.info("Socket------连接通道数量: " + General.CHANNEL_MAP.size());
             General.CHANNEL_TYPE_MAP.remove(channelId);
@@ -103,10 +133,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
  
         //将客户端的信息直接返回写入ctx
         log.info("Socket------服务端端返回报文......【" + channelId + "】" + " :" + (String) msg);
-//        ctx.channel().writeAndFlush(msg);
-//        ctx.writeAndFlush(msg);
-        //刷新缓存区
-//        ctx.flush();
         //过滤掉当前通道id
         Set<ChannelId> channelIdSet = General.CHANNEL_MAP.keySet().stream().filter(id -> !id.asLongText().equalsIgnoreCase(channelId.asLongText())).collect(Collectors.toSet());
         //广播消息到客户端

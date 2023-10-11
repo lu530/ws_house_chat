@@ -46,7 +46,7 @@ public class ValidateTokenAspect {
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         assert requestAttributes != null;
-        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+       // HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         ValidateToken validateToken = method.getAnnotation(ValidateToken.class);
@@ -68,7 +68,7 @@ public class ValidateTokenAspect {
             }else{
                 ImUserToken imUserToken = iImUserTokenService.checkToken(token);
                 if (Objects.isNull(imUserToken)) {
-                    log.error("req error1:{},{},{},{}", token, request.getLocalAddr(), request.getLocalPort(), request.getRequestURI());
+                //    log.error("req error1:{},{},{},{}", token, request.getLocalAddr(), request.getLocalPort(), request.getRequestURI());
                     return ResponseVO.errorResponse(ApiCode.TOKEN_INVALID.getValue(), ApiCode.TOKEN_INVALID.getMessage());
                 }
                 baseReq.setUserId(imUserToken.getUserId());

@@ -30,7 +30,7 @@ public class ImMessageReq extends BaseReq {
     @ApiModelProperty(value = "接收方类型(1 普通用户 2 系统公告全部用户 3 群用户)")
     private Integer toType;
 
-    @ApiModelProperty(value = "消息类型(0 登录 1 文本 2 录音 3 图片 4 视频 5 语音通话 6 视频通话)")
+    @ApiModelProperty(value = "消息类型(1 文本 2 录音 3 图片 4 视频 5 语音通话 6 视频通话 7 登录 8 登出)")
     private Integer messageType;
 
     @ApiModelProperty(value = "消息内容")

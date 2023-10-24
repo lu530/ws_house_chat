@@ -78,13 +78,13 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
             log.info("收到socket消息：" + strMsg);
         }
 
+        ResponseVO<ImMessageResp> resp = null;
         if(!StringUtils.isEmpty(strMsg)){
             ImMessageReq imMessageReq = JSONObject.parseObject(strMsg, ImMessageReq.class);
-            ResponseVO<ImMessageResp> handler = getIImMessageDataService().handler(imMessageReq, ctx.channel().id());
-            strMsg = JSONObject.toJSONString(handler);
+            resp = getIImMessageDataService().handler(imMessageReq, ctx.channel().id());
         }
 
-        this.channelWrite(ctx.channel().id(), strMsg);
+        this.channelWrite(ctx.channel().id(), resp);
     }
 
 
@@ -110,6 +110,10 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
             log.info("Socket------客户端【" + channelId + "】退出netty服务器[IP:" + clientIp + "--->PORT:" + insocket.getPort() + "]");
             log.info("Socket------连接通道数量: " + General.CHANNEL_MAP.size());
             General.CHANNEL_TYPE_MAP.remove(channelId);
+
+            String userId = General.channelIdUserIdHashMap.get(channelId);
+            General.userIdChannelIdHashMap.remove(userId);
+            General.channelIdUserIdHashMap.remove(channelId);
         }
     }
  
@@ -117,7 +121,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
     /**
      * 服务端给客户端发送消息
      */
-    public void channelWrite(ChannelId channelId, Object msg) throws Exception {
+    public void channelWrite(ChannelId channelId, ResponseVO<ImMessageResp> msg) throws Exception {
  
         ChannelHandlerContext ctx = General.CHANNEL_MAP.get(channelId);
  
@@ -126,16 +130,24 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
             return;
         }
  
-        if (msg == null || msg == "") {
+        if (msg == null ) {
             log.info("Socket------服务端响应空的消息");
             return;
         }
  
         //将客户端的信息直接返回写入ctx
-        log.info("Socket------服务端端返回报文......【" + channelId + "】" + " :" + (String) msg);
+        log.info("Socket------服务端端返回报文......【" + channelId + "】" + " :" + JSONObject.toJSONString(msg));
+
+        String toId = msg.getData().getToId();
+        ChannelId toUserchannelId = General.userIdChannelIdHashMap.get(toId);
+        if(Objects.nonNull(toUserchannelId)){
+            General.CHANNEL_MAP.get(toUserchannelId).channel().writeAndFlush(new TextWebSocketFrame(JSONObject.toJSONString(msg)));
+        }else{
+            //TODO 对方不在线需要记录到消息表里面
+        }
+           /*    TODO 群发
         //过滤掉当前通道id
         Set<ChannelId> channelIdSet = General.CHANNEL_MAP.keySet().stream().filter(id -> !id.asLongText().equalsIgnoreCase(channelId.asLongText())).collect(Collectors.toSet());
-        //广播消息到客户端
         for (ChannelId id : channelIdSet) {
             //是websocket协议
             Boolean aBoolean = General.CHANNEL_TYPE_MAP.get(id);
@@ -145,7 +157,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
                 ByteBuf byteBuf = Unpooled.copiedBuffer(((String) msg).getBytes());
                 General.CHANNEL_MAP.get(id).channel().writeAndFlush(byteBuf);
             }
-        }
+        }*/
     }
  
     /**

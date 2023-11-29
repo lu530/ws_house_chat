@@ -52,7 +52,7 @@ public class MinioUtil {
         				.contentType(contentType)
         				.build();
         ObjectWriteResponse response = minioClient.putObject(putArgs);
-        
+		stream.close();
         return response;
 	}
 	

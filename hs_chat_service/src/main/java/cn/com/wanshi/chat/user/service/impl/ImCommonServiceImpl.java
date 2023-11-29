@@ -41,7 +41,7 @@ public class ImCommonServiceImpl implements ImCommonService {
 
     public ResponseVO<String> upload(@RequestParam("file") MultipartFile multipartFile) throws Exception {
         ObjectWriteResponse objectWriteResponse = minioUtil.uploadFile("ws-house-chat-2023", multipartFile.getOriginalFilename(), multipartFile);
-        return ResponseVO.successResponse(bucketName + multipartFile.getOriginalFilename());
+        return ResponseVO.successResponse(bucketName + "/"+ multipartFile.getOriginalFilename());
     }
 
 

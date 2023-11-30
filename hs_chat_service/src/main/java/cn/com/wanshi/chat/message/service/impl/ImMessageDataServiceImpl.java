@@ -49,10 +49,13 @@ public class ImMessageDataServiceImpl extends ServiceImpl<ImMessageDataMapper, I
                 return login(imMessageReq, channelId);
             case TEXT:
                 return text(imMessageReq, channelId);
+            case PICTURE:
+                return picture(imMessageReq, channelId);
             default:
                 return null;
         }
     }
+
 
     private ResponseVO<ImMessageResp> login(ImMessageReq imMessageReq, ChannelId channelId){
         General.userIdChannelIdHashMap.put(imMessageReq.getUserId(), channelId);
@@ -83,6 +86,23 @@ public class ImMessageDataServiceImpl extends ServiceImpl<ImMessageDataMapper, I
                 .messageTime(new Date())
                 .build();
         return ResponseVO.successResponse(build);
+    }
+
+
+    private ResponseVO<ImMessageResp> picture(ImMessageReq imMessageReq, ChannelId channelId) {
+        ImMessageResp build = ImMessageResp.builder()
+                .messageType(MessageTypeEnum.PICTURE.getType())
+                .fromType(MessageFromUserTypeEnum.NORMAL_USER.getType())
+                .fromId(imMessageReq.getUserId())
+                .toId(imMessageReq.getToId())
+                .realStatus(YesNoEnum.NO.value)
+                .toType(MessageToUserTypeEnum.NORMAL_USER.getType())
+                .meesageData(imMessageReq.getMeesageData())
+                .messageTime(new Date())
+                .build();
+        return ResponseVO.successResponse(build);
+
+
     }
 
 }

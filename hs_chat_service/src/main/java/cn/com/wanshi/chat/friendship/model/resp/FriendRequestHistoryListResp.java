@@ -18,7 +18,7 @@ import java.util.Date;
 public  class FriendRequestHistoryListResp extends FriendResp{
 
         @ApiModelProperty(value = "好友申请ID")
-        private Long friendshipRequestId;
+        private Integer friendshipRequestId;
 
         @ApiModelProperty(value = "审批状态 1同意 2拒绝 3拉入黑名单")
         private Integer approveStatus;

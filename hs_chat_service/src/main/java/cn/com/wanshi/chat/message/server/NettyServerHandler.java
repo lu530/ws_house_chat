@@ -2,6 +2,7 @@ package cn.com.wanshi.chat.message.server;
 
 
 import cn.com.wanshi.chat.common.constants.General;
+import cn.com.wanshi.chat.common.constants.TopicNameConstants;
 import cn.com.wanshi.chat.common.utils.AppContextHelper;
 import cn.com.wanshi.chat.message.model.req.ImMessageReq;
 import cn.com.wanshi.chat.message.model.req.ImMessageResp;
@@ -20,6 +21,7 @@ import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.net.InetSocketAddress;
 import java.util.Objects;
@@ -39,6 +41,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
     IImMessageDataService imMessageDataService;
 
 
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
+
     private IImMessageDataService getIImMessageDataService(){
         if(Objects.isNull(imMessageDataService)){
             imMessageDataService = AppContextHelper.getBean(IImMessageDataService.class);
@@ -46,9 +51,17 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
         return imMessageDataService;
     }
 
+    private KafkaTemplate<String, Object> getKafkaTemplate(){
+        if(Objects.isNull(kafkaTemplate)){
+            kafkaTemplate = AppContextHelper.getBean(KafkaTemplate.class);
+        }
+        return kafkaTemplate;
+    }
 
- 
- 
+
+
+
+
     //由于继承了SimpleChannelInboundHandler，这个方法必须实现，否则报错
     //但实际应用中，这个方法没被调用
     @Override
@@ -138,13 +151,15 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
         //将客户端的信息直接返回写入ctx
         log.info("Socket------服务端端返回报文......【" + channelId + "】" + " :" + JSONObject.toJSONString(msg));
 
+        String msgJsonStr = JSONObject.toJSONString(msg);
         String toId = msg.getData().getToId();
         ChannelId toUserchannelId = General.userIdChannelIdHashMap.get(toId);
         if(Objects.nonNull(toUserchannelId)){
-            General.CHANNEL_MAP.get(toUserchannelId).channel().writeAndFlush(new TextWebSocketFrame(JSONObject.toJSONString(msg)));
+            General.CHANNEL_MAP.get(toUserchannelId).channel().writeAndFlush(new TextWebSocketFrame(msgJsonStr));
         }else{
             //TODO 对方不在线需要记录到消息表里面
         }
+        getKafkaTemplate().send(TopicNameConstants.MQ_WS_IM_MESSAGE_TOPIC, msgJsonStr);
            /*    TODO 群发
         //过滤掉当前通道id
         Set<ChannelId> channelIdSet = General.CHANNEL_MAP.keySet().stream().filter(id -> !id.asLongText().equalsIgnoreCase(channelId.asLongText())).collect(Collectors.toSet());

@@ -8,9 +8,9 @@ import cn.com.wanshi.chat.message.model.req.ImMessageReq;
 import cn.com.wanshi.chat.message.model.req.ImMessageResp;
 import cn.com.wanshi.chat.message.service.IImMessageDataService;
 import cn.com.wanshi.common.ResponseVO;
+import cn.com.wanshi.common.enums.YesNoEnum;
 import com.alibaba.fastjson.JSONObject;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -25,8 +25,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import java.net.InetSocketAddress;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
  
  
 /**
@@ -152,14 +150,16 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
         log.info("Socket------服务端端返回报文......【" + channelId + "】" + " :" + JSONObject.toJSONString(msg));
 
         String msgJsonStr = JSONObject.toJSONString(msg);
+        ImMessageResp data = msg.getData();
         String toId = msg.getData().getToId();
         ChannelId toUserchannelId = General.userIdChannelIdHashMap.get(toId);
         if(Objects.nonNull(toUserchannelId)){
             General.CHANNEL_MAP.get(toUserchannelId).channel().writeAndFlush(new TextWebSocketFrame(msgJsonStr));
+            data.setSendStatus(YesNoEnum.YES.value);
         }else{
-            //TODO 对方不在线需要记录到消息表里面
+            data.setSendStatus(YesNoEnum.NO.value);
         }
-        getKafkaTemplate().send(TopicNameConstants.MQ_WS_IM_MESSAGE_TOPIC, msgJsonStr);
+        getKafkaTemplate().send(TopicNameConstants.MQ_WS_IM_MESSAGE_TOPIC, JSONObject.toJSONString(data));
            /*    TODO 群发
         //过滤掉当前通道id
         Set<ChannelId> channelIdSet = General.CHANNEL_MAP.keySet().stream().filter(id -> !id.asLongText().equalsIgnoreCase(channelId.asLongText())).collect(Collectors.toSet());

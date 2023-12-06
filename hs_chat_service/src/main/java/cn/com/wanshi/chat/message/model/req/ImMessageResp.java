@@ -42,4 +42,8 @@ public class ImMessageResp {
 
     @ApiModelProperty(value = "是否已读 0未读 1已读")
     private Integer realStatus;
+
+
+    @ApiModelProperty(value = "是否已发 0未发 1已发")
+    private Integer sendStatus;
 }

@@ -15,54 +15,57 @@ public enum MessageTypeEnum {
     /**
      * 文本
      */
-    TEXT(1),
+    TEXT(1, true),
 
     /**
      * 录音
      */
-    SOUND_RECORDING(2),
+    SOUND_RECORDING(2, true),
 
 
     /**
      * 图片
      */
-    PICTURE(3),
+    PICTURE(3, true),
 
     /**
      * 视频
      */
-    VIDEO(4),
+    VIDEO(4, true),
 
 
     /**
      * 语音通话
      */
-    VOICE_CALL(5),
+    VOICE_CALL(5, true),
 
     /**
      * 视频通话
      */
-    VIDEO_CALL(6),
+    VIDEO_CALL(6, true),
 
     /**
      * 登录
      */
-    LOGIN(7),
+    LOGIN(7, false),
 
     /**
      * 登出
      */
-   LOGOUT(8),
+   LOGOUT(8, false),
 
     /**
      * 心跳
      */
-    PING(9);
+    PING(9, false);
 
     /**
      * 值
      */
     public final int type;
+
+
+    public final boolean needPersistence;
 
 
 

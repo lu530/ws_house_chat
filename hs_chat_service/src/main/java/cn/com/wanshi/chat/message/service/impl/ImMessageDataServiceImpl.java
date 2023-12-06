@@ -5,6 +5,7 @@ import cn.com.wanshi.chat.common.constants.General;
 import cn.com.wanshi.chat.common.enums.MessageFromUserTypeEnum;
 import cn.com.wanshi.chat.common.enums.MessageToUserTypeEnum;
 import cn.com.wanshi.chat.common.enums.MessageTypeEnum;
+import cn.com.wanshi.chat.common.utils.BeanCopyUtils;
 import cn.com.wanshi.chat.message.entity.ImMessageData;
 import cn.com.wanshi.chat.message.mapper.ImMessageDataMapper;
 import cn.com.wanshi.chat.message.model.req.ImMessageReq;
@@ -14,8 +15,11 @@ import cn.com.wanshi.common.ResponseVO;
 import cn.com.wanshi.common.enums.YesNoEnum;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.netty.channel.ChannelId;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -54,6 +58,26 @@ public class ImMessageDataServiceImpl extends ServiceImpl<ImMessageDataMapper, I
             default:
                 return null;
         }
+    }
+
+    @Override
+    @Transactional
+    public void addImMessageData(ImMessageResp imMessageResp) {
+        MessageTypeEnum enumByType = MessageTypeEnum.getEnumByType(imMessageResp.getMessageType());
+        //判断是否需要保存消息数据
+        if(!enumByType.needPersistence){
+            return;
+        }
+        ImMessageData toImMessageData = new ImMessageData();
+        ImMessageData fromImMessageData = new ImMessageData();
+        BeanUtils.copyProperties(imMessageResp, toImMessageData);
+        BeanUtils.copyProperties(imMessageResp, fromImMessageData);
+        Date now = new Date();
+        toImMessageData.setCreateTime(now);
+        fromImMessageData.setCreateTime(now);
+        toImMessageData.setOwnerId(imMessageResp.getToId());
+        fromImMessageData.setOwnerId(imMessageResp.getFromId());
+        this.saveBatch(Arrays.asList(toImMessageData, fromImMessageData));
     }
 
 
@@ -101,8 +125,6 @@ public class ImMessageDataServiceImpl extends ServiceImpl<ImMessageDataMapper, I
                 .messageTime(new Date())
                 .build();
         return ResponseVO.successResponse(build);
-
-
     }
 
 }

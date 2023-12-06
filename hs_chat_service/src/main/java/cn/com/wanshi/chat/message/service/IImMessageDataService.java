@@ -24,4 +24,6 @@ public interface IImMessageDataService extends IService<ImMessageData> {
      * @return
      */
     ResponseVO<ImMessageResp> handler(ImMessageReq imMessageReq, ChannelId channelId);
+
+    void addImMessageData(ImMessageResp imMessageResp);
 }

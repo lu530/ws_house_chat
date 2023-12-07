@@ -1,11 +1,16 @@
 package cn.com.wanshi.chat.message.service;
 
 import cn.com.wanshi.chat.message.entity.ImMessageData;
+import cn.com.wanshi.chat.message.model.req.ImMessageCountReq;
+import cn.com.wanshi.chat.message.model.req.ImMessageListReq;
 import cn.com.wanshi.chat.message.model.req.ImMessageReq;
-import cn.com.wanshi.chat.message.model.req.ImMessageResp;
+import cn.com.wanshi.chat.message.model.resp.ImMessageCountResp;
+import cn.com.wanshi.chat.message.model.resp.ImMessageResp;
 import cn.com.wanshi.common.ResponseVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.netty.channel.ChannelId;
+
+import java.util.List;
 
 /**
  * <p>
@@ -25,5 +30,23 @@ public interface IImMessageDataService extends IService<ImMessageData> {
      */
     ResponseVO<ImMessageResp> handler(ImMessageReq imMessageReq, ChannelId channelId);
 
+    /**
+     * 新增即时消息落库
+     * @param imMessageResp
+     */
     void addImMessageData(ImMessageResp imMessageResp);
+
+    /**
+     * 获取聊天消息列表
+     * @param req
+     * @return
+     */
+    ResponseVO<List<ImMessageResp>> messageList(ImMessageListReq req);
+
+    /**
+     * 获取聊天消息列表统计数
+     * @param req
+     * @return
+     */
+    ResponseVO<List<ImMessageCountResp>> messageCount(ImMessageCountReq req);
 }

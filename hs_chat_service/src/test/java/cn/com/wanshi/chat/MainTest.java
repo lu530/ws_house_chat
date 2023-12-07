@@ -1,6 +1,6 @@
 package cn.com.wanshi.chat;
 
-import cn.com.wanshi.chat.message.model.req.ImMessageResp;
+import cn.com.wanshi.chat.message.model.resp.ImMessageResp;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.Date;

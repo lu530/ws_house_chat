@@ -1,29 +1,28 @@
 package cn.com.wanshi.chat.message.model.req;
 
 
+import cn.com.wanshi.chat.common.model.BaseReq;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 /**
  * @author zhongzhicheng
- * 用户发消息请求类
+ * 用户消息数量请求体
  */
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class ImMessageResp {
+public class ImMessageCountReq extends BaseReq {
+
 
     @ApiModelProperty(value = "发送方id")
     private String fromId;
 
-    @ApiModelProperty(value = "接收方id")
+    @ApiModelProperty(value = "接收方Id")
     private String toId;
+
+    @ApiModelProperty(value = "消息数据拥有者（发送方和接收方都会有一条记录）")
+    private String ownerId;
 
     @ApiModelProperty(value = "发送方类型(1 普通用户 2 系统公告 3 系统标识)")
     private Integer fromType;
@@ -40,10 +39,11 @@ public class ImMessageResp {
     @ApiModelProperty(value = "消息发送时间")
     private Date messageTime;
 
-    @ApiModelProperty(value = "是否已读 0未读 1已读")
-    private Integer realStatus;
-
 
     @ApiModelProperty(value = "是否已发 0未发 1已发")
     private Integer sendStatus;
+
+    @ApiModelProperty(value = "消息的发送者是否等于拥有者")
+    private Boolean fromIdNEqOwerIdFlag;
+
 }

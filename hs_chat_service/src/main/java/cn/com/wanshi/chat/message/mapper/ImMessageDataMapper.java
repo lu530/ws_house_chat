@@ -1,7 +1,11 @@
 package cn.com.wanshi.chat.message.mapper;
 
 import cn.com.wanshi.chat.message.entity.ImMessageData;
+import cn.com.wanshi.chat.message.model.req.ImMessageCountReq;
+import cn.com.wanshi.chat.message.model.resp.ImMessageCountResp;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +17,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface ImMessageDataMapper extends BaseMapper<ImMessageData> {
 
+    /**
+     * 消息统计
+     * @param req
+     * @return
+     */
+    List<ImMessageCountResp> messageCount(ImMessageCountReq req);
 }

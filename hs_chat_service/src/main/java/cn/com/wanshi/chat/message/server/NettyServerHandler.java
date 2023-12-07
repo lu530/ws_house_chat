@@ -5,7 +5,7 @@ import cn.com.wanshi.chat.common.constants.General;
 import cn.com.wanshi.chat.common.constants.TopicNameConstants;
 import cn.com.wanshi.chat.common.utils.AppContextHelper;
 import cn.com.wanshi.chat.message.model.req.ImMessageReq;
-import cn.com.wanshi.chat.message.model.req.ImMessageResp;
+import cn.com.wanshi.chat.message.model.resp.ImMessageResp;
 import cn.com.wanshi.chat.message.service.IImMessageDataService;
 import cn.com.wanshi.common.ResponseVO;
 import cn.com.wanshi.common.enums.YesNoEnum;

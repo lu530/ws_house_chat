@@ -2,4 +2,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.com.wanshi.chat.message.mapper.ImMessageDataMapper">
 
+    <select id="messageCount" resultType="cn.com.wanshi.chat.message.model.resp.ImMessageCountResp"
+            parameterType="cn.com.wanshi.chat.message.model.req.ImMessageCountReq">
+
+        select count(1) as count, from_id as fromId from im_message_data imd
+        <where>
+            <if test="ownerId != null and ownerId != ''">
+                AND imd.owner_id = #{ownerId}
+            </if>
+
+            <if test="ownerId != null and ownerId != '' and fromIdNEqOwerIdFlag != null and fromIdNEqOwerIdFlag">
+                AND imd.from_id <![CDATA[ <> ]]>  #{ownerId}
+            </if>
+
+            <if test="sendStatus != null ">
+                AND imd.send_status = #{sendStatus}
+            </if>
+        </where>
+        group by imd.from_id
+    </select>
 </mapper>

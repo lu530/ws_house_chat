@@ -2,7 +2,7 @@ package cn.com.wanshi.chat.message.listener;
 
 
 import cn.com.wanshi.chat.common.constants.TopicNameConstants;
-import cn.com.wanshi.chat.message.model.req.ImMessageResp;
+import cn.com.wanshi.chat.message.model.resp.ImMessageResp;
 import cn.com.wanshi.chat.message.service.IImMessageDataService;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;

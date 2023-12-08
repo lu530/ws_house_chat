@@ -9,14 +9,17 @@ import cn.com.wanshi.chat.friendship.entity.ImFriendshipRequest;
 import cn.com.wanshi.chat.friendship.model.resp.FriendRequestCountResp;
 import cn.com.wanshi.chat.message.entity.ImMessageData;
 import cn.com.wanshi.chat.message.mapper.ImMessageDataMapper;
+import cn.com.wanshi.chat.message.model.req.ImFriendMessagesReq;
 import cn.com.wanshi.chat.message.model.req.ImMessageCountReq;
 import cn.com.wanshi.chat.message.model.req.ImMessageListReq;
 import cn.com.wanshi.chat.message.model.req.ImMessageReq;
+import cn.com.wanshi.chat.message.model.resp.ImFriendMessagesResp;
 import cn.com.wanshi.chat.message.model.resp.ImMessageCountResp;
 import cn.com.wanshi.chat.message.model.resp.ImMessageResp;
 import cn.com.wanshi.chat.message.service.IImMessageDataService;
 import cn.com.wanshi.common.ResponseVO;
 import cn.com.wanshi.common.enums.YesNoEnum;
+import cn.com.wanshi.common.utils.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.netty.channel.ChannelId;
@@ -30,6 +33,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -126,6 +130,29 @@ public class ImMessageDataServiceImpl extends ServiceImpl<ImMessageDataMapper, I
     public ResponseVO<List<ImMessageCountResp>> messageCount(ImMessageCountReq req) {
         List<ImMessageCountResp> result = imMessageDataMapper.messageCount(req);
         return ResponseVO.successResponse(result);
+    }
+
+    @Override
+    public ResponseVO<List<ImFriendMessagesResp>> friendMessages(ImFriendMessagesReq req) {
+        List<ImFriendMessagesResp> list = imMessageDataMapper.friendMessages(req);
+        Date now = new Date();
+        list = list.stream().map(m -> {
+            Date messageTime = m.getMessageTime();
+            int messageTimedd = Integer.parseInt(DateUtil.getDateString(messageTime, "dd"));
+            int dd = Integer.parseInt(DateUtil.getDateString(now, "dd"));
+            int timeDiff = dd - messageTimedd;
+            String messageTimeStr = DateUtil.getDateString(messageTime, "yy/MM/dd");
+            //一天内显示时间 昨天起的显示
+            if(timeDiff < 1){
+                messageTimeStr = DateUtil.getDateString(messageTime, "HH:mm");
+            }else if(timeDiff < 2){
+                //昨天
+                messageTimeStr = "昨天";
+            }
+            m.setMessageTimeStr(messageTimeStr);
+            return m;
+        }).collect(Collectors.toList());
+        return ResponseVO.successResponse(list);
     }
 
 

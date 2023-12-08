@@ -4,9 +4,11 @@ package cn.com.wanshi.chat.message.controller;
 import cn.com.wanshi.chat.common.annotation.ValidateToken;
 import cn.com.wanshi.chat.friendship.model.req.FriendAgreeRequestReq;
 import cn.com.wanshi.chat.friendship.model.resp.FriendAgreeRequestResp;
+import cn.com.wanshi.chat.message.model.req.ImFriendMessagesReq;
 import cn.com.wanshi.chat.message.model.req.ImMessageCountReq;
 import cn.com.wanshi.chat.message.model.req.ImMessageListReq;
 import cn.com.wanshi.chat.message.model.req.ImMessageReq;
+import cn.com.wanshi.chat.message.model.resp.ImFriendMessagesResp;
 import cn.com.wanshi.chat.message.model.resp.ImMessageCountResp;
 import cn.com.wanshi.chat.message.model.resp.ImMessageResp;
 import cn.com.wanshi.chat.message.service.IImMessageDataService;
@@ -48,6 +50,19 @@ public class ImMessageDataController {
     }
 
 
+    @ApiOperation("获取好友消息列表接口")
+    @PostMapping("/friend/messages")
+    @ValidateToken
+    public ResponseVO<List<ImFriendMessagesResp>> friendMessages(@RequestBody @Validated ImFriendMessagesReq req){
+        req.setOwnerId(req.getUserId());
+        req.setToId(req.getUserId());
+        req.setFromIdNEqOwerIdFlag(true);
+        ResponseVO<List<ImFriendMessagesResp>>  result = iImMessageDataService.friendMessages(req);
+        return result;
+    }
+
+
+
     @ApiOperation("获取消息数量")
     @PostMapping("/count")
     @ValidateToken
@@ -56,5 +71,6 @@ public class ImMessageDataController {
         ResponseVO<List<ImMessageCountResp>>  result = iImMessageDataService.messageCount(req);
         return result;
     }
+
 
 }

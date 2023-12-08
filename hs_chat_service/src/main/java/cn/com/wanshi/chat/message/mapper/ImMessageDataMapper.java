@@ -1,7 +1,9 @@
 package cn.com.wanshi.chat.message.mapper;
 
 import cn.com.wanshi.chat.message.entity.ImMessageData;
+import cn.com.wanshi.chat.message.model.req.ImFriendMessagesReq;
 import cn.com.wanshi.chat.message.model.req.ImMessageCountReq;
+import cn.com.wanshi.chat.message.model.resp.ImFriendMessagesResp;
 import cn.com.wanshi.chat.message.model.resp.ImMessageCountResp;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -23,4 +25,11 @@ public interface ImMessageDataMapper extends BaseMapper<ImMessageData> {
      * @return
      */
     List<ImMessageCountResp> messageCount(ImMessageCountReq req);
+
+    /**
+     * 获取好友消息列表接口
+     * @param req
+     * @return
+     */
+    List<ImFriendMessagesResp> friendMessages(ImFriendMessagesReq req);
 }

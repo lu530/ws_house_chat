@@ -30,7 +30,7 @@ public class ImUserData implements Serializable {
 
     @ApiModelProperty(value = "主键")
     @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    private Integer id;
 
     @ApiModelProperty(value = "用户id")
     private String userId;

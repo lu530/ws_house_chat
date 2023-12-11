@@ -72,16 +72,18 @@ public class ImFriendshipServiceImpl extends ServiceImpl<ImFriendshipMapper, ImF
             one.setFriendNickName(req.getFriendNickName());
             one.setUpdateTime(now);
             this.updateById(one);
+        }else{
+            ImFriendship imFriendship = new ImFriendship();
+            BeanUtils.copyProperties(req, imFriendship);
+            imFriendship.setFromId(req.getUserId());
+            imFriendship.setToId(req.getToId());
+            imFriendship.setBlack(FriendshipBlackEnum.NORMAL.getValue());
+            imFriendship.setStatus(FriendshipStatusEnum.NORMAL.getValue());
+            imFriendship.setUpdateTime(now);
+            imFriendship.setCreateTime(now);
+            this.save(imFriendship);
         }
-        ImFriendship imFriendship = new ImFriendship();
-        BeanUtils.copyProperties(req, imFriendship);
-        imFriendship.setFromId(req.getUserId());
-        imFriendship.setToId(req.getToId());
-        imFriendship.setBlack(FriendshipBlackEnum.NORMAL.getValue());
-        imFriendship.setStatus(FriendshipStatusEnum.NORMAL.getValue());
-        imFriendship.setUpdateTime(now);
-        imFriendship.setCreateTime(now);
-        this.save(imFriendship);
+
         //请求方好友关系保存
         ImFriendshipRequest imFriendshipRequest = imFriendshipRequestMapper.selectById(req.getFriendshipRequestId());
 
@@ -99,14 +101,15 @@ public class ImFriendshipServiceImpl extends ServiceImpl<ImFriendshipMapper, ImF
             applyOne.setFriendNickName(imFriendshipRequest.getFriendNickName());
             applyOne.setUpdateTime(now);
             this.updateById(one);
+        }else{
+            ImFriendship applyImFriendship = new ImFriendship();
+            BeanUtils.copyProperties(imFriendshipRequest, applyImFriendship);
+            applyImFriendship.setBlack(FriendshipBlackEnum.NORMAL.getValue());
+            applyImFriendship.setStatus(FriendshipStatusEnum.NORMAL.getValue());
+            applyImFriendship.setUpdateTime(now);
+            applyImFriendship.setCreateTime(now);
+            this.save(applyImFriendship);
         }
-        ImFriendship applyImFriendship = new ImFriendship();
-        BeanUtils.copyProperties(imFriendshipRequest, applyImFriendship);
-        applyImFriendship.setBlack(FriendshipBlackEnum.NORMAL.getValue());
-        applyImFriendship.setStatus(FriendshipStatusEnum.NORMAL.getValue());
-        applyImFriendship.setUpdateTime(now);
-        applyImFriendship.setCreateTime(now);
-        this.save(applyImFriendship);
 
         imFriendshipRequest.setApproveStatus(FriendApplyApproveStatusEnum.AGREE.getValue());
         imFriendshipRequestMapper.updateById(imFriendshipRequest);

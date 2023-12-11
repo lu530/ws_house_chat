@@ -38,12 +38,13 @@
             MAX(message_time) as message_time
             from
             im_message_data
-            group by
+          where from_id <![CDATA[ <> ]]> owner_id
+        group by
             from_id
             ) t2 on
             t1.message_time = t2.message_time
             join im_friendship if2
-            on t1.from_id = if2.from_id and t1.to_id = if2.to_id
+            on t1.from_id = if2.to_id and  t1.to_id = if2.from_id
             join im_user_data u
             on t1.from_id = u.user_id
             <where>
@@ -53,7 +54,6 @@
                 <if test="ownerId != null and ownerId != '' and fromIdNEqOwerIdFlag != null and fromIdNEqOwerIdFlag">
                     AND t1.from_id <![CDATA[ <> ]]>  #{ownerId}
                 </if>
-
             </where>
     </select>
 </mapper>

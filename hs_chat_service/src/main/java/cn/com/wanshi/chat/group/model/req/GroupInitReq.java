@@ -24,7 +24,7 @@ public class GroupInitReq extends BaseReq {
      * 群成员 是userId集合
      */
     @ApiModelProperty(value = "群成员 是userId集合")
-    private List<String> GroupMembers;
+    private List<String> groupMembers;
 
 
 

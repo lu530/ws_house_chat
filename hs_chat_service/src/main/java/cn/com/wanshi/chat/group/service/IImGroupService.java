@@ -6,6 +6,8 @@ import cn.com.wanshi.chat.group.model.resp.GroupInitResp;
 import cn.com.wanshi.common.ResponseVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.io.IOException;
+
 /**
  * <p>
  * 群消息表 服务类
@@ -16,5 +18,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IImGroupService extends IService<ImGroup> {
 
-    ResponseVO<GroupInitResp> groupInit(GroupInitReq req);
+    ResponseVO<GroupInitResp> groupInit(GroupInitReq req) throws IOException, Exception;
 }

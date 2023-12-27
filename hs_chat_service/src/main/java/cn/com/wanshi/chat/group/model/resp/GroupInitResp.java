@@ -20,4 +20,8 @@ public class GroupInitResp {
     private String groupName;
 
 
+    @ApiModelProperty(value = "群头像")
+    private String photo;
+
+
 }

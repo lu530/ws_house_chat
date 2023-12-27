@@ -2,13 +2,14 @@ package cn.com.wanshi.chat.group.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -40,31 +41,35 @@ public class ImGroupMember implements Serializable {
     private String memberId;
 
     @ApiModelProperty(value = "是否全员禁言，0 不禁言；1 全员禁言。")
-    private Boolean mute;
+    private Integer mute;
 
-    @ApiModelProperty(value = "群成员类型，0 普通成员, 1 管理员, 2 群主， 3 禁言，4 已经移除的成员")
-    private Boolean role;
+    @ApiModelProperty(value = "群成员类型，0 普通成员, 1 管理员, 2 群主， 3 禁言")
+    private Integer role;
 
     @ApiModelProperty(value = "群昵称")
     private String alias;
 
     @ApiModelProperty(value = "加入时间")
-    private LocalDateTime joinTime;
+    private Date joinTime;
 
     @ApiModelProperty(value = "离开时间")
-    private LocalDateTime leaveTime;
+    private Date leaveTime;
 
-    @ApiModelProperty(value = "加入方式 1 搜索群, 2 好友拉，")
-    private Boolean joinType;
+
+    @ApiModelProperty(value = "是否已经离群 0 否 1 是")
+    private Integer leaveFlag;
+
+    @ApiModelProperty(value = "加入方式 1 搜索群, 2 好友拉, 3 扫描进群")
+    private Integer joinType;
 
     @ApiModelProperty(value = "介绍人(被何人邀请)")
     private String introducer;
 
     @ApiModelProperty(value = "生成时间")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     @ApiModelProperty(value = "更新时间")
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
 
 }

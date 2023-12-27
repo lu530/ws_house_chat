@@ -17,4 +17,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class ImGroupMemberServiceImpl extends ServiceImpl<ImGroupMemberMapper, ImGroupMember> implements IImGroupMemberService {
 
+
+
 }

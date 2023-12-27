@@ -5,8 +5,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,16 +38,39 @@ public final class ImageUtil {
     private ImageUtil() {
     }
 
+
+    public static boolean saveLocatCombinationOfhead(List<String> paths, String dir, String groupId)
+            throws IOException {
+        BufferedImage outImage = getCombinationOfhead(paths);
+
+        StringBuffer outPath = new StringBuffer().append(dir)
+                .append(File.separatorChar)
+                .append("GP-" + groupId).append(".jpg");
+
+        String format = "JPG";
+        File file = new File(outPath.toString());
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+
+        return ImageIO.write(outImage, format, file);
+
+    }
+
+    public static InputStream getCombinationOfheadInputStream(List<String> paths) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(getCombinationOfhead(paths), "png", os);
+        return new ByteArrayInputStream(os.toByteArray());
+    }
+
     /**
      * 生成群组头像
      *
      * @param paths   图片链接
-     * @param dir     输出路径
-     * @param groupId 群编号
      * @return
      * @throws IOException
      */
-    public static boolean getCombinationOfhead(List<String> paths, String dir, String groupId)
+    public static BufferedImage getCombinationOfhead(List<String> paths)
             throws IOException {
         List<BufferedImage> bufferedImages = new ArrayList<BufferedImage>();
 
@@ -170,18 +192,11 @@ public final class ImageUtil {
                     break;
             }
         }
-
-        StringBuffer outPath = new StringBuffer().append(dir)
-                .append(File.separatorChar)
-                .append("GP-" + groupId).append(".jpg");
-
-        String format = "JPG";
-        File file = new File(outPath.toString());
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        return ImageIO.write(outImage, format, file);
+        return outImage;
     }
+
+
+
 
     /**
      * 图片缩放
@@ -273,7 +288,7 @@ public final class ImageUtil {
             //生成目录
             String path = file.getCanonicalPath() + "groupImage\\";
             groupId++;
-            ImageUtil.getCombinationOfhead(list, path, groupId.toString());
+            ImageUtil.saveLocatCombinationOfhead(list, path, groupId.toString());
         }
     }
 }

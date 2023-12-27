@@ -2,8 +2,6 @@ package cn.com.wanshi.chat.group.controller;
 
 
 import cn.com.wanshi.chat.common.annotation.ValidateToken;
-import cn.com.wanshi.chat.friendship.model.req.FriendAgreeRequestReq;
-import cn.com.wanshi.chat.friendship.model.resp.FriendAgreeRequestResp;
 import cn.com.wanshi.chat.group.model.req.GroupInitReq;
 import cn.com.wanshi.chat.group.model.resp.GroupInitResp;
 import cn.com.wanshi.chat.group.service.IImGroupService;
@@ -14,7 +12,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -36,7 +33,7 @@ public class ImGroupController {
     @ApiOperation("新建群")
     @PostMapping("/group/init")
     @ValidateToken
-    public ResponseVO<GroupInitResp> groupInit(@RequestBody @Validated GroupInitReq req){
+    public ResponseVO<GroupInitResp> groupInit(@RequestBody @Validated GroupInitReq req) throws Exception {
         ResponseVO<GroupInitResp> result = iImGroupService.groupInit(req);
         return result;
     }

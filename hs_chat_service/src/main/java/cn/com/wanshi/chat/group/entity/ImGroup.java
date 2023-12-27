@@ -4,8 +4,12 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.Date;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.models.auth.In;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -37,16 +41,16 @@ public class ImGroup implements Serializable {
     private String ownerId;
 
     @ApiModelProperty(value = "群类型 1私有群（类似微信） 2公开群(类似qq)")
-    private Boolean groupType;
+    private Integer groupType;
 
     @ApiModelProperty(value = "群名称")
     private String groupName;
 
     @ApiModelProperty(value = "是否全员禁言，0 不禁言；1 全员禁言。")
-    private Boolean mute;
+    private Integer mute;
 
     @ApiModelProperty(value = "申请加群选项包括如下几种:0 表示禁止任何人申请加入、1 表示需要群主或管理员审批、2 表示允许无需审批自由加入群组")
-    private Boolean applyJoinType;
+    private Integer applyJoinType;
 
     @ApiModelProperty(value = "群简介")
     private String introduction;
@@ -61,13 +65,13 @@ public class ImGroup implements Serializable {
     private Integer maxMemberCount;
 
     @ApiModelProperty(value = "群状态 0正常 1解散")
-    private Boolean status;
+    private Integer status;
 
     @ApiModelProperty(value = "生成时间")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     @ApiModelProperty(value = "更新时间")
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
 
 }

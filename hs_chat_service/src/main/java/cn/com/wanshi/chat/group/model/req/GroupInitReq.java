@@ -4,6 +4,7 @@ import cn.com.wanshi.chat.common.model.BaseReq;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**
@@ -13,16 +14,12 @@ import java.util.List;
 public class GroupInitReq extends BaseReq {
 
 
-    /**
-     * 群名称
-     */
-    @ApiModelProperty(value = "群名称")
-    private String groupName;
 
 
     /**
      * 群成员 是userId集合
      */
+    @NotEmpty
     @ApiModelProperty(value = "群成员 是userId集合")
     private List<String> groupMembers;
 

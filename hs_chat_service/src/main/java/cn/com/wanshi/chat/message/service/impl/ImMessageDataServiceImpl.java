@@ -173,7 +173,7 @@ public class ImMessageDataServiceImpl extends ServiceImpl<ImMessageDataMapper, I
     private ResponseVO<ImMessageResp> text(ImMessageReq imMessageReq, ChannelId channelId){
         ImMessageResp build = ImMessageResp.builder()
                 .messageType(MessageTypeEnum.TEXT.getType())
-                .fromType(MessageFromUserTypeEnum.NORMAL_USER.getType())
+                .fromType(imMessageReq.getFromType())
                 .fromId(imMessageReq.getUserId())
                 .toId(imMessageReq.getToId())
                 .realStatus(YesNoEnum.NO.value)
@@ -188,7 +188,7 @@ public class ImMessageDataServiceImpl extends ServiceImpl<ImMessageDataMapper, I
     private ResponseVO<ImMessageResp> picture(ImMessageReq imMessageReq, ChannelId channelId) {
         ImMessageResp build = ImMessageResp.builder()
                 .messageType(MessageTypeEnum.PICTURE.getType())
-                .fromType(MessageFromUserTypeEnum.NORMAL_USER.getType())
+                .fromType(imMessageReq.getFromType())
                 .fromId(imMessageReq.getUserId())
                 .toId(imMessageReq.getToId())
                 .realStatus(YesNoEnum.NO.value)

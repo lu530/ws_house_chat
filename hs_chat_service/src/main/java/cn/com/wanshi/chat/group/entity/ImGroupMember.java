@@ -40,6 +40,9 @@ public class ImGroupMember implements Serializable {
     @ApiModelProperty(value = "成员id")
     private String memberId;
 
+    @ApiModelProperty(value = "头像url")
+    private String photo;
+
     @ApiModelProperty(value = "是否全员禁言，0 不禁言；1 全员禁言。")
     private Integer mute;
 

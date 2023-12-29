@@ -1,8 +1,10 @@
 package cn.com.wanshi.chat.common.constants;
  
+import cn.com.wanshi.chat.group.entity.ImGroupMember;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
- 
+
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
  
 /**
@@ -36,5 +38,11 @@ public class General {
      * 管理一个全局mao, 保存连接进服务器的各个通道类型
      */
     public static final ConcurrentHashMap<ChannelId, Boolean> CHANNEL_TYPE_MAP = new ConcurrentHashMap<>();
+
+
+    /**
+     * 管理一个全局mao, groupId -> List<members>
+     */
+    public static final ConcurrentHashMap<String, List<ImGroupMember>> GROUP_TO_MEMBERS_MAP = new ConcurrentHashMap<>();
  
 }

@@ -3,7 +3,10 @@ package cn.com.wanshi.chat.message.server;
 
 import cn.com.wanshi.chat.common.constants.General;
 import cn.com.wanshi.chat.common.constants.TopicNameConstants;
+import cn.com.wanshi.chat.common.enums.MessageFromUserTypeEnum;
 import cn.com.wanshi.chat.common.utils.AppContextHelper;
+import cn.com.wanshi.chat.group.entity.ImGroupMember;
+import cn.com.wanshi.chat.group.service.IImGroupMemberService;
 import cn.com.wanshi.chat.message.model.req.ImMessageReq;
 import cn.com.wanshi.chat.message.model.resp.ImMessageResp;
 import cn.com.wanshi.chat.message.service.IImMessageDataService;
@@ -24,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.Objects;
  
  
@@ -39,6 +43,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
     IImMessageDataService imMessageDataService;
 
 
+    IImGroupMemberService imGroupMemberService;
+
+
     private KafkaTemplate<String, Object> kafkaTemplate;
 
 
@@ -47,6 +54,12 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
             imMessageDataService = AppContextHelper.getBean(IImMessageDataService.class);
         }
         return imMessageDataService;
+    }
+    private IImGroupMemberService getImGroupMemberService(){
+        if(Objects.isNull(imGroupMemberService)){
+            imGroupMemberService = AppContextHelper.getBean(IImGroupMemberService.class);
+        }
+        return imGroupMemberService;
     }
 
     private KafkaTemplate<String, Object> getKafkaTemplate(){
@@ -98,9 +111,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
         this.channelWrite(ctx.channel().id(), resp);
     }
 
-
-
-
  
     /**
      * 有客户端终止连接服务器会触发此函数
@@ -149,17 +159,41 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
         //将客户端的信息直接返回写入ctx
         log.info("Socket------服务端端返回报文......【" + channelId + "】" + " :" + JSONObject.toJSONString(msg));
 
-        String msgJsonStr = JSONObject.toJSONString(msg);
         ImMessageResp data = msg.getData();
-        String toId = msg.getData().getToId();
-        ChannelId toUserchannelId = General.userIdChannelIdHashMap.get(toId);
-        if(Objects.nonNull(toUserchannelId)){
-            General.CHANNEL_MAP.get(toUserchannelId).channel().writeAndFlush(new TextWebSocketFrame(msgJsonStr));
-            data.setSendStatus(YesNoEnum.YES.value);
-        }else{
-            data.setSendStatus(YesNoEnum.NO.value);
+        //单聊
+        if(data.getFromType().equals(MessageFromUserTypeEnum.NORMAL_USER.type)){
+            String toId = msg.getData().getToId();
+            ChannelId toUserchannelId = General.userIdChannelIdHashMap.get(toId);
+            if(Objects.nonNull(toUserchannelId)){
+                String msgJsonStr = JSONObject.toJSONString(msg);
+                General.CHANNEL_MAP.get(toUserchannelId).channel().writeAndFlush(new TextWebSocketFrame(msgJsonStr));
+                data.setSendStatus(YesNoEnum.YES.value);
+            }else{
+                data.setSendStatus(YesNoEnum.NO.value);
+            }
+            getKafkaTemplate().send(TopicNameConstants.MQ_WS_IM_MESSAGE_TOPIC, JSONObject.toJSONString(data));
         }
-        getKafkaTemplate().send(TopicNameConstants.MQ_WS_IM_MESSAGE_TOPIC, JSONObject.toJSONString(data));
+
+        if(data.getFromType().equals(MessageFromUserTypeEnum.GROUP_USERS.type)){
+            String groupId = msg.getData().getToId();
+            String fromId = msg.getData().getFromId();
+            List<ImGroupMember> imgroupMembersByGroupId = getImGroupMemberService().getImgroupMembersByGroupId(groupId);
+            for(ImGroupMember item: imgroupMembersByGroupId){
+                if(item.getMemberId().equals(fromId)){
+                    continue;
+                }
+                ChannelId toUserchannelId = General.userIdChannelIdHashMap.get(item.getMemberId());
+                if(Objects.nonNull(toUserchannelId)){
+                    msg.getData().setFromId(groupId);
+                    msg.getData().setToId(item.getMemberId());
+                    String msgJsonStr = JSONObject.toJSONString(msg);
+                    General.CHANNEL_MAP.get(toUserchannelId).channel().writeAndFlush(new TextWebSocketFrame(msgJsonStr));
+                    data.setSendStatus(YesNoEnum.YES.value);
+                }else{
+                    data.setSendStatus(YesNoEnum.NO.value);
+                }
+            }
+        }
            /*    TODO 群发
         //过滤掉当前通道id
         Set<ChannelId> channelIdSet = General.CHANNEL_MAP.keySet().stream().filter(id -> !id.asLongText().equalsIgnoreCase(channelId.asLongText())).collect(Collectors.toSet());

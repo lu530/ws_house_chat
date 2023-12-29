@@ -27,6 +27,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -85,15 +87,20 @@ public class ImGroupServiceImpl extends ServiceImpl<ImGroupMapper, ImGroup> impl
         }).collect(Collectors.toList());
         InputStream combinationOfheadInputStream = ImageUtil.getCombinationOfheadInputStream(imageList);
 
+        Map<String, ImUserData> userMap = usersByUserIds.stream().collect(Collectors.toMap(ImUserData::getUserId, Function.identity(),
+                (existing, replacement) -> existing));
+
         minioUtil.putObject(bucketName, imGroup.getGroupId() + ".jpg", combinationOfheadInputStream, combinationOfheadInputStream.available(), "image/jpeg");
 
         String photoUrl = bucketName + "/"+ imGroup.getGroupId() + ".jpg";
         imGroup.setPhoto(photoUrl);
 
         List<ImGroupMember> groupMembers = req.getGroupMembers().stream().map(item -> {
+            ImUserData imUserData = userMap.get(item);
             ImGroupMember groupMember = new ImGroupMember();
             groupMember.setGroupId(imGroup.getGroupId());
             groupMember.setGroupMemberId("GM" + SerialNoUtil.getUNID());
+            groupMember.setPhoto(imUserData.getPhoto());
             groupMember.setMemberId(item);
             groupMember.setJoinTime(now);
             groupMember.setJoinType(GroupJoinTypeEnum.FRIEND_RECOMMEND.getValue());
@@ -103,10 +110,12 @@ public class ImGroupServiceImpl extends ServiceImpl<ImGroupMapper, ImGroup> impl
             return groupMember;
         }).collect(Collectors.toList());
 
+        ImUserData imUserData = userMap.get(req.getUserId());
         ImGroupMember groupMember = new ImGroupMember();
         groupMember.setGroupId(imGroup.getGroupId());
         groupMember.setGroupMemberId("GM"+ SerialNoUtil.getUNID());
         groupMember.setMemberId(req.getUserId());
+        groupMember.setPhoto(imUserData.getPhoto());
         groupMember.setJoinTime(now);
         groupMember.setJoinType(GroupJoinTypeEnum.CREATOR.getValue());
         groupMember.setRole(GroupRoleEnum.GROUP_LEADER.getValue());

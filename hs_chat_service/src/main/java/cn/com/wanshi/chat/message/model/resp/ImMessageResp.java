@@ -25,7 +25,7 @@ public class ImMessageResp {
     @ApiModelProperty(value = "接收方id")
     private String toId;
 
-    @ApiModelProperty(value = "发送方类型(1 普通用户 2 系统公告 3 系统标识)")
+    @ApiModelProperty(value = "发送方类型(1 普通用户 2 系统公告全部用户 3 群用户)")
     private Integer fromType;
 
     @ApiModelProperty(value = "接收方类型(1 普通用户 2 系统公告全部用户 3 群用户)")

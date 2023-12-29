@@ -24,4 +24,11 @@ public class GroupInitResp {
     private String photo;
 
 
+    @ApiModelProperty(value = "群id")
+    private String groupId;
+
+
+
+
+
 }

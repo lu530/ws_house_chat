@@ -1,6 +1,7 @@
 package cn.com.wanshi.chat.common.enums;
 
 
+import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -33,7 +34,7 @@ public enum MessageToUserTypeEnum {
     /**
      * 值
      */
-    public final int type;
+    public final Integer type;
 
 
 

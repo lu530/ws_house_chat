@@ -29,10 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -151,7 +148,7 @@ public class ImMessageDataServiceImpl extends ServiceImpl<ImMessageDataMapper, I
             }
             m.setMessageTimeStr(messageTimeStr);
             return m;
-        }).collect(Collectors.toList());
+        }).sorted(Comparator.comparing(ImFriendMessagesResp::getMessageTime).reversed()).collect(Collectors.toList());
         return ResponseVO.successResponse(list);
     }
 

@@ -40,6 +40,9 @@ public class ImFriendMessagesResp {
     @ApiModelProperty(value = "是否已读 0未读 1已读")
     private Integer realStatus;
 
+    @ApiModelProperty(value = "接收方类型(1 普通用户 2 系统公告全部用户 3 群用户)")
+    private Integer fromType;
+
 
     @ApiModelProperty(value = "消息发送时间")
     private Date messageTime;

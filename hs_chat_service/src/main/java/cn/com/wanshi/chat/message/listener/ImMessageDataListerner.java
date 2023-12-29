@@ -39,7 +39,6 @@ public class ImMessageDataListerner {
             String immessageStr = kafkaMessage.get().toString();
             ImMessageResp imMessageResp = JSONObject.parseObject(immessageStr, ImMessageResp.class);
             imMessageDataService.addImMessageData(imMessageResp);
-
         }
     }
 

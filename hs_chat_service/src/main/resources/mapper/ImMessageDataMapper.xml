@@ -38,7 +38,14 @@
             MAX(message_time) as message_time
             from
             im_message_data
-          where from_id <![CDATA[ <> ]]> owner_id
+            <where>
+                <if test="ownerId != null and ownerId != ''">
+                    AND owner_id = #{ownerId}
+                </if>
+                <if test="ownerId != null and ownerId != '' and fromIdNEqOwerIdFlag != null and fromIdNEqOwerIdFlag">
+                    AND from_id <![CDATA[ <> ]]>  #{ownerId}
+                </if>
+            </where>
         group by
             from_id
             ) t2 on
@@ -54,6 +61,51 @@
                 <if test="ownerId != null and ownerId != '' and fromIdNEqOwerIdFlag != null and fromIdNEqOwerIdFlag">
                     AND t1.from_id <![CDATA[ <> ]]>  #{ownerId}
                 </if>
+                and t1.from_type = 1
             </where>
+        union
+        select
+        t1.*,
+        u.group_name as nick_name,
+        u.group_id as account,
+        u.photo,
+        u.group_name as friend_nick_name
+        from
+        im_message_data t1
+        join (
+        select
+        MAX(message_time) as message_time
+        from
+        im_message_data
+        <where>
+            <if test="ownerId != null and ownerId != ''">
+                AND owner_id = #{ownerId}
+            </if>
+            <if test="ownerId != null and ownerId != '' and fromIdNEqOwerIdFlag != null and fromIdNEqOwerIdFlag">
+                AND from_id <![CDATA[ <> ]]>  #{ownerId}
+            </if>
+            and from_type = 3
+        </where>
+        group by
+        from_id
+        ) t2 on
+        t1.message_time = t2.message_time
+        join im_group_member if2
+        on
+        t1.from_id = if2.group_id
+        and t1.to_id = if2.member_id
+        join im_group u
+        on
+        t1.from_id = u.group_id
+        <where>
+            <if test="ownerId != null and ownerId != ''">
+                AND t1.owner_id = #{ownerId}
+            </if>
+            <if test="ownerId != null and ownerId != '' and fromIdNEqOwerIdFlag != null and fromIdNEqOwerIdFlag">
+                AND t1.from_id <![CDATA[ <> ]]>  #{ownerId}
+            </if>
+            and t1.from_type = 3
+        </where>
+
     </select>
 </mapper>

@@ -4,10 +4,7 @@ package cn.com.wanshi.chat.message.controller;
 import cn.com.wanshi.chat.common.annotation.ValidateToken;
 import cn.com.wanshi.chat.friendship.model.req.FriendAgreeRequestReq;
 import cn.com.wanshi.chat.friendship.model.resp.FriendAgreeRequestResp;
-import cn.com.wanshi.chat.message.model.req.ImFriendMessagesReq;
-import cn.com.wanshi.chat.message.model.req.ImMessageCountReq;
-import cn.com.wanshi.chat.message.model.req.ImMessageListReq;
-import cn.com.wanshi.chat.message.model.req.ImMessageReq;
+import cn.com.wanshi.chat.message.model.req.*;
 import cn.com.wanshi.chat.message.model.resp.ImFriendMessagesResp;
 import cn.com.wanshi.chat.message.model.resp.ImMessageCountResp;
 import cn.com.wanshi.chat.message.model.resp.ImMessageResp;
@@ -48,6 +45,16 @@ public class ImMessageDataController {
         ResponseVO<List<ImMessageResp>>  result = iImMessageDataService.messageList(req);
         return result;
     }
+
+
+    @ApiOperation("获取群的消息列表接口")
+    @PostMapping("/group/list")
+    @ValidateToken
+    public ResponseVO<List<ImMessageResp>> groupMessageList(@RequestBody @Validated ImGroupMessageListReq req){
+        ResponseVO<List<ImMessageResp>>  result = iImMessageDataService.groupMessageList(req);
+        return result;
+    }
+
 
 
     @ApiOperation("获取好友消息列表接口")

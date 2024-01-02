@@ -50,7 +50,7 @@ public class ImGroupMember implements Serializable {
     private Integer role;
 
     @ApiModelProperty(value = "群昵称")
-    private String alias;
+    private String nickName;
 
     @ApiModelProperty(value = "加入时间")
     private Date joinTime;

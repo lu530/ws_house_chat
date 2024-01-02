@@ -25,6 +25,10 @@ public class ImMessageResp {
     @ApiModelProperty(value = "接收方id")
     private String toId;
 
+
+    @ApiModelProperty(value = "消息归属者")
+    private String ownerId;
+
     @ApiModelProperty(value = "发送方类型(1 普通用户 2 系统公告全部用户 3 群用户)")
     private Integer fromType;
 
@@ -36,6 +40,13 @@ public class ImMessageResp {
 
     @ApiModelProperty(value = "消息内容")
     private String meesageData;
+
+
+    @ApiModelProperty(value = "头像url")
+    private String photo;
+
+    @ApiModelProperty(value = "群昵称")
+    private String nickName;
 
     @ApiModelProperty(value = "消息发送时间")
     private Date messageTime;

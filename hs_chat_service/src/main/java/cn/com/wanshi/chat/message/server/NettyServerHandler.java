@@ -10,6 +10,7 @@ import cn.com.wanshi.chat.group.service.IImGroupMemberService;
 import cn.com.wanshi.chat.message.model.req.ImMessageReq;
 import cn.com.wanshi.chat.message.model.resp.ImMessageResp;
 import cn.com.wanshi.chat.message.service.IImMessageDataService;
+import cn.com.wanshi.chat.user.entity.ImUserData;
 import cn.com.wanshi.common.ResponseVO;
 import cn.com.wanshi.common.enums.YesNoEnum;
 import com.alibaba.fastjson.JSONObject;
@@ -28,9 +29,12 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
- 
- 
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+
 /**
  * @author dzx
  * @ClassName:
@@ -171,42 +175,35 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
             }else{
                 data.setSendStatus(YesNoEnum.NO.value);
             }
-            getKafkaTemplate().send(TopicNameConstants.MQ_WS_IM_MESSAGE_TOPIC, JSONObject.toJSONString(data));
         }
 
         if(data.getFromType().equals(MessageFromUserTypeEnum.GROUP_USERS.type)){
             String groupId = msg.getData().getToId();
             String fromId = msg.getData().getFromId();
             List<ImGroupMember> imgroupMembersByGroupId = getImGroupMemberService().getImgroupMembersByGroupId(groupId);
+            Map<String, ImGroupMember> userMap = imgroupMembersByGroupId.stream().collect(Collectors.toMap(ImGroupMember::getMemberId, Function.identity(),
+                    (existing, replacement) -> existing));
+            ImGroupMember imGroupMember = userMap.get(fromId);
+            msg.getData().setOwnerId(fromId);
+            msg.getData().setFromId(groupId);
+            msg.getData().setNickName(imGroupMember.getNickName());
+            msg.getData().setPhoto(imGroupMember.getPhoto());
             for(ImGroupMember item: imgroupMembersByGroupId){
                 if(item.getMemberId().equals(fromId)){
                     continue;
                 }
+                msg.getData().setToId(item.getMemberId());
                 ChannelId toUserchannelId = General.userIdChannelIdHashMap.get(item.getMemberId());
                 if(Objects.nonNull(toUserchannelId)){
-                    msg.getData().setFromId(groupId);
-                    msg.getData().setToId(item.getMemberId());
                     String msgJsonStr = JSONObject.toJSONString(msg);
                     General.CHANNEL_MAP.get(toUserchannelId).channel().writeAndFlush(new TextWebSocketFrame(msgJsonStr));
                     data.setSendStatus(YesNoEnum.YES.value);
                 }else{
                     data.setSendStatus(YesNoEnum.NO.value);
                 }
+                getKafkaTemplate().send(TopicNameConstants.MQ_WS_IM_MESSAGE_TOPIC, JSONObject.toJSONString(data));
             }
         }
-           /*    TODO 群发
-        //过滤掉当前通道id
-        Set<ChannelId> channelIdSet = General.CHANNEL_MAP.keySet().stream().filter(id -> !id.asLongText().equalsIgnoreCase(channelId.asLongText())).collect(Collectors.toSet());
-        for (ChannelId id : channelIdSet) {
-            //是websocket协议
-            Boolean aBoolean = General.CHANNEL_TYPE_MAP.get(id);
-            if(aBoolean!=null && aBoolean){
-                General.CHANNEL_MAP.get(id).channel().writeAndFlush(new TextWebSocketFrame((String) msg));
-            }else {
-                ByteBuf byteBuf = Unpooled.copiedBuffer(((String) msg).getBytes());
-                General.CHANNEL_MAP.get(id).channel().writeAndFlush(byteBuf);
-            }
-        }*/
     }
  
     /**

@@ -101,6 +101,7 @@ public class ImGroupServiceImpl extends ServiceImpl<ImGroupMapper, ImGroup> impl
             groupMember.setGroupId(imGroup.getGroupId());
             groupMember.setGroupMemberId("GM" + SerialNoUtil.getUNID());
             groupMember.setPhoto(imUserData.getPhoto());
+            groupMember.setNickName(imUserData.getNickName());
             groupMember.setMemberId(item);
             groupMember.setJoinTime(now);
             groupMember.setJoinType(GroupJoinTypeEnum.FRIEND_RECOMMEND.getValue());
@@ -116,6 +117,7 @@ public class ImGroupServiceImpl extends ServiceImpl<ImGroupMapper, ImGroup> impl
         groupMember.setGroupMemberId("GM"+ SerialNoUtil.getUNID());
         groupMember.setMemberId(req.getUserId());
         groupMember.setPhoto(imUserData.getPhoto());
+        groupMember.setNickName(imUserData.getNickName());
         groupMember.setJoinTime(now);
         groupMember.setJoinType(GroupJoinTypeEnum.CREATOR.getValue());
         groupMember.setRole(GroupRoleEnum.GROUP_LEADER.getValue());
@@ -131,7 +133,7 @@ public class ImGroupServiceImpl extends ServiceImpl<ImGroupMapper, ImGroup> impl
         imMessageData.setToType(MessageToUserTypeEnum.NORMAL_USER.getType());
         imMessageData.setToId(req.getUserId());
         imMessageData.setMessageType(MessageTypeEnum.TEXT.getType());
-        imMessageData.setMeesageData("");
+        imMessageData.setMeesageData("你创建了新群");
         imMessageData.setSendStatus(YesNoEnum.YES.value);
         imMessageData.setCreateTime(now);
         imMessageData.setMessageTime(now);

@@ -1,10 +1,7 @@
 package cn.com.wanshi.chat.message.service;
 
 import cn.com.wanshi.chat.message.entity.ImMessageData;
-import cn.com.wanshi.chat.message.model.req.ImFriendMessagesReq;
-import cn.com.wanshi.chat.message.model.req.ImMessageCountReq;
-import cn.com.wanshi.chat.message.model.req.ImMessageListReq;
-import cn.com.wanshi.chat.message.model.req.ImMessageReq;
+import cn.com.wanshi.chat.message.model.req.*;
 import cn.com.wanshi.chat.message.model.resp.ImFriendMessagesResp;
 import cn.com.wanshi.chat.message.model.resp.ImMessageCountResp;
 import cn.com.wanshi.chat.message.model.resp.ImMessageResp;
@@ -45,6 +42,14 @@ public interface IImMessageDataService extends IService<ImMessageData> {
      */
     ResponseVO<List<ImMessageResp>> messageList(ImMessageListReq req);
 
+
+    /**
+     * 获取群聊天消息列表
+     * @param req
+     * @return
+     */
+    ResponseVO<List<ImMessageResp>> groupMessageList(ImGroupMessageListReq req);
+
     /**
      * 获取聊天消息列表统计数
      * @param req
@@ -58,4 +63,6 @@ public interface IImMessageDataService extends IService<ImMessageData> {
      * @return
      */
     ResponseVO<List<ImFriendMessagesResp>> friendMessages(ImFriendMessagesReq req);
+
+
 }

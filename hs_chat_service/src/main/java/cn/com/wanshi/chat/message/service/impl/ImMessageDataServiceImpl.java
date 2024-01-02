@@ -7,19 +7,20 @@ import cn.com.wanshi.chat.common.enums.MessageToUserTypeEnum;
 import cn.com.wanshi.chat.common.enums.MessageTypeEnum;
 import cn.com.wanshi.chat.friendship.entity.ImFriendshipRequest;
 import cn.com.wanshi.chat.friendship.model.resp.FriendRequestCountResp;
+import cn.com.wanshi.chat.group.entity.ImGroupMember;
 import cn.com.wanshi.chat.message.entity.ImMessageData;
 import cn.com.wanshi.chat.message.mapper.ImMessageDataMapper;
-import cn.com.wanshi.chat.message.model.req.ImFriendMessagesReq;
-import cn.com.wanshi.chat.message.model.req.ImMessageCountReq;
-import cn.com.wanshi.chat.message.model.req.ImMessageListReq;
-import cn.com.wanshi.chat.message.model.req.ImMessageReq;
+import cn.com.wanshi.chat.message.model.req.*;
 import cn.com.wanshi.chat.message.model.resp.ImFriendMessagesResp;
 import cn.com.wanshi.chat.message.model.resp.ImMessageCountResp;
 import cn.com.wanshi.chat.message.model.resp.ImMessageResp;
 import cn.com.wanshi.chat.message.service.IImMessageDataService;
+import cn.com.wanshi.chat.user.entity.ImUserData;
+import cn.com.wanshi.chat.user.service.IImUserDataService;
 import cn.com.wanshi.common.ResponseVO;
 import cn.com.wanshi.common.enums.YesNoEnum;
 import cn.com.wanshi.common.utils.DateUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.netty.channel.ChannelId;
@@ -30,6 +31,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -46,6 +50,10 @@ public class ImMessageDataServiceImpl extends ServiceImpl<ImMessageDataMapper, I
 
     @Autowired
     private ImMessageDataMapper imMessageDataMapper;
+
+
+    @Autowired
+    private IImUserDataService imUserDataService;
 
 
     /**
@@ -82,6 +90,17 @@ public class ImMessageDataServiceImpl extends ServiceImpl<ImMessageDataMapper, I
         if(!enumByType.needPersistence){
             return;
         }
+
+        //群消息只保存一条记录
+        if(imMessageResp.getFromType().equals(MessageFromUserTypeEnum.GROUP_USERS.getType())){
+            ImMessageData toImMessageData = new ImMessageData();
+            BeanUtils.copyProperties(imMessageResp, toImMessageData);
+            Date now = new Date();
+            toImMessageData.setCreateTime(now);
+            this.save(toImMessageData);
+            return;
+        }
+
         ImMessageData toImMessageData = new ImMessageData();
         ImMessageData fromImMessageData = new ImMessageData();
         BeanUtils.copyProperties(imMessageResp, toImMessageData);
@@ -124,6 +143,50 @@ public class ImMessageDataServiceImpl extends ServiceImpl<ImMessageDataMapper, I
     }
 
     @Override
+    public ResponseVO<List<ImMessageResp>> groupMessageList(ImGroupMessageListReq req) {
+        LambdaQueryWrapper<ImMessageData> lqw = new LambdaQueryWrapper<>();
+
+        if(Objects.nonNull(req.getGroupId())){
+            lqw.eq(ImMessageData::getFromId, req.getGroupId());
+        }
+
+        if(Objects.nonNull(req.getUserId())){
+            lqw.eq(ImMessageData::getToId, req.getUserId());
+        }
+
+        if(Objects.nonNull(req.getSendStatus())){
+            lqw.eq(ImMessageData::getSendStatus, req.getSendStatus());
+        }
+
+        List<ImMessageData> list = this.list(lqw);
+        if(CollectionUtil.isEmpty(list)){
+            return ResponseVO.successResponse(new ArrayList<>());
+        }
+        List<String> owerUserList = list.stream().map(ImMessageData::getOwnerId).collect(Collectors.toList());
+        List<ImUserData> usersByUserIds = imUserDataService.getUsersByUserIds(owerUserList);
+
+        Map<String, ImUserData> userMap = usersByUserIds.stream().collect(Collectors.toMap(ImUserData::getUserId, Function.identity(),
+                (existing, replacement) -> existing));
+
+        List<Object> collect = list.stream().map(item -> {
+            ImUserData imUserData = userMap.get(item.getOwnerId());
+            ImMessageResp resp = new ImMessageResp();
+            BeanUtils.copyProperties(item, resp);
+            resp.setNickName(imUserData.getNickName());
+            resp.setPhoto(imUserData.getPhoto());
+            return resp;
+        }).collect(Collectors.toList());
+
+
+        if(Objects.nonNull(req.getSendStatus()) && req.getSendStatus().equals(YesNoEnum.NO.value)){
+            ImMessageData build = ImMessageData.builder().sendStatus(YesNoEnum.YES.value).build();
+            //发送状态更新为已经发
+            this.update(build, lqw);
+        }
+        return ResponseVO.successResponse(collect);
+    }
+
+    @Override
     public ResponseVO<List<ImMessageCountResp>> messageCount(ImMessageCountReq req) {
         List<ImMessageCountResp> result = imMessageDataMapper.messageCount(req);
         return ResponseVO.successResponse(result);
@@ -133,7 +196,7 @@ public class ImMessageDataServiceImpl extends ServiceImpl<ImMessageDataMapper, I
     public ResponseVO<List<ImFriendMessagesResp>> friendMessages(ImFriendMessagesReq req) {
         List<ImFriendMessagesResp> list = imMessageDataMapper.friendMessages(req);
         Date now = new Date();
-        list = list.stream().map(m -> {
+        list = list.stream().filter(distinctByKey(ImFriendMessagesResp::getFromId)).map(m -> {
             Date messageTime = m.getMessageTime();
             int messageTimedd = Integer.parseInt(DateUtil.getDateString(messageTime, "dd"));
             int dd = Integer.parseInt(DateUtil.getDateString(now, "dd"));
@@ -151,6 +214,12 @@ public class ImMessageDataServiceImpl extends ServiceImpl<ImMessageDataMapper, I
         }).sorted(Comparator.comparing(ImFriendMessagesResp::getMessageTime).reversed()).collect(Collectors.toList());
         return ResponseVO.successResponse(list);
     }
+
+    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    }
+
 
 
     private ResponseVO<ImMessageResp> login(ImMessageReq imMessageReq, ChannelId channelId){

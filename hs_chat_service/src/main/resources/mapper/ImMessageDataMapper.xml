@@ -79,10 +79,7 @@
         im_message_data
         <where>
             <if test="ownerId != null and ownerId != ''">
-                AND owner_id = #{ownerId}
-            </if>
-            <if test="ownerId != null and ownerId != '' and fromIdNEqOwerIdFlag != null and fromIdNEqOwerIdFlag">
-                AND from_id <![CDATA[ <> ]]>  #{ownerId}
+                from_id in (select distinct group_id from im_group_member where member_id = #{ownerId})
             </if>
             and from_type = 3
         </where>
@@ -99,13 +96,9 @@
         t1.from_id = u.group_id
         <where>
             <if test="ownerId != null and ownerId != ''">
-                AND t1.owner_id = #{ownerId}
-            </if>
-            <if test="ownerId != null and ownerId != '' and fromIdNEqOwerIdFlag != null and fromIdNEqOwerIdFlag">
-                AND t1.from_id <![CDATA[ <> ]]>  #{ownerId}
+                t1.from_id in (select distinct group_id from im_group_member where member_id =  #{ownerId})
             </if>
             and t1.from_type = 3
         </where>
-
     </select>
 </mapper>

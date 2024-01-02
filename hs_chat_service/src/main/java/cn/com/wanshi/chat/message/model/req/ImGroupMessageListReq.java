@@ -12,20 +12,12 @@ import java.util.Date;
  * 用户发消息请求类
  */
 @Data
-public class ImMessageListReq extends BaseReq {
+public class ImGroupMessageListReq extends BaseReq {
 
+    @ApiModelProperty(value = "群Id")
+    private String groupId;
 
-    @ApiModelProperty(value = "发送方id")
-    private String fromId;
-
-    @ApiModelProperty(value = "接收方Id")
-    private String toId;
-
-
-    @ApiModelProperty(value = "消息数据拥有者（发送方和接收方都会有一条记录）")
-    private String ownerId;
-
-    @ApiModelProperty(value = "发送方类型(1 普通用户 2 系统公告 3 系统标识)")
+    @ApiModelProperty(value = "发送方类型(1 普通用户 2 系统公告全部用户 3 群用户)")
     private Integer fromType;
 
     @ApiModelProperty(value = "接收方类型(1 普通用户 2 系统公告全部用户 3 群用户)")

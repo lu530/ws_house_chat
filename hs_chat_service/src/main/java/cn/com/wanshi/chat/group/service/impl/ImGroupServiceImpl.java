@@ -133,7 +133,7 @@ public class ImGroupServiceImpl extends ServiceImpl<ImGroupMapper, ImGroup> impl
         imMessageData.setToType(MessageToUserTypeEnum.NORMAL_USER.getType());
         imMessageData.setToId(req.getUserId());
         imMessageData.setMessageType(MessageTypeEnum.TEXT.getType());
-        imMessageData.setMeesageData("你创建了新群");
+        imMessageData.setMeesageData(imUserData.getNickName() + "创建了新群");
         imMessageData.setSendStatus(YesNoEnum.YES.value);
         imMessageData.setCreateTime(now);
         imMessageData.setMessageTime(now);

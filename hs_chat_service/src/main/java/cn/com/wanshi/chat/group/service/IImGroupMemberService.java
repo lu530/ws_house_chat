@@ -4,6 +4,7 @@ import cn.com.wanshi.chat.group.entity.ImGroupMember;
 import cn.com.wanshi.chat.group.model.req.GroupMemberAddReq;
 import cn.com.wanshi.chat.group.model.req.GroupMemberListReq;
 import cn.com.wanshi.chat.group.model.req.GroupMemberRemoveReq;
+import cn.com.wanshi.chat.group.model.resp.GroupInitResp;
 import cn.com.wanshi.chat.group.model.resp.GroupMemberAddResp;
 import cn.com.wanshi.chat.group.model.resp.GroupMemberRemoveResp;
 import cn.com.wanshi.chat.group.model.resp.GroupMemberResp;
@@ -28,7 +29,9 @@ public interface IImGroupMemberService extends IService<ImGroupMember> {
 
     ResponseVO<List<GroupMemberResp>> groupMemberList(GroupMemberListReq req);
 
-    ResponseVO<GroupMemberRemoveResp> groupMemberRemove(GroupMemberRemoveReq req);
+    ResponseVO<GroupMemberRemoveResp> groupMemberRemove(GroupMemberRemoveReq req) throws Exception;
 
-    ResponseVO<GroupMemberAddResp> groupMemberAdd(GroupMemberAddReq req);
+    ResponseVO<GroupMemberAddResp> groupMemberAdd(GroupMemberAddReq req) throws Exception;
+
+    GroupInitResp updateGroupNameAndPhoto(String groupId) throws Exception;
 }

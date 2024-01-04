@@ -64,7 +64,7 @@ public class ImGroupController {
     @ApiOperation("群成员删除")
     @PostMapping("/member/remove")
     @ValidateToken
-    public ResponseVO<GroupMemberRemoveResp> groupMemberRemove(@RequestBody @Validated GroupMemberRemoveReq req) {
+    public ResponseVO<GroupMemberRemoveResp> groupMemberRemove(@RequestBody @Validated GroupMemberRemoveReq req) throws Exception {
         ResponseVO<GroupMemberRemoveResp> result = iImGroupMemberService.groupMemberRemove(req);
         return result;
     }
@@ -72,7 +72,7 @@ public class ImGroupController {
     @ApiOperation("群成员删除")
     @PostMapping("/member/add")
     @ValidateToken
-    public ResponseVO<GroupMemberAddResp> groupMemberAdd(@RequestBody @Validated GroupMemberAddReq req) {
+    public ResponseVO<GroupMemberAddResp> groupMemberAdd(@RequestBody @Validated GroupMemberAddReq req) throws Exception {
         ResponseVO<GroupMemberAddResp> result = iImGroupMemberService.groupMemberAdd(req);
         return result;
     }

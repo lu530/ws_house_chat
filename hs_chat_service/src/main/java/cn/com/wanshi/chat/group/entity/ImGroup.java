@@ -46,6 +46,9 @@ public class ImGroup implements Serializable {
     @ApiModelProperty(value = "群名称")
     private String groupName;
 
+    @ApiModelProperty(value = "是否是自定义群名称 0 否 1 是")
+    private Integer customNameFlag;
+
     @ApiModelProperty(value = "是否全员禁言，0 不禁言；1 全员禁言。")
     private Integer mute;
 

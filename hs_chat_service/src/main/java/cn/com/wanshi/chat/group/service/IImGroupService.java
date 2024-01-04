@@ -19,4 +19,9 @@ import java.io.IOException;
 public interface IImGroupService extends IService<ImGroup> {
 
     ResponseVO<GroupInitResp> groupInit(GroupInitReq req) throws IOException, Exception;
+
+
+
+
+
 }

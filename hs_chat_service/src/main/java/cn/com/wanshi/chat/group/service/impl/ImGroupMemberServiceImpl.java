@@ -3,14 +3,19 @@ package cn.com.wanshi.chat.group.service.impl;
 import cn.com.wanshi.chat.common.constants.General;
 import cn.com.wanshi.chat.common.enums.GroupJoinTypeEnum;
 import cn.com.wanshi.chat.common.enums.GroupRoleEnum;
+import cn.com.wanshi.chat.common.enums.GroupStatusEnum;
 import cn.com.wanshi.chat.common.utils.BeanCopyUtils;
+import cn.com.wanshi.chat.common.utils.ImageUtil;
+import cn.com.wanshi.chat.common.utils.MinioUtil;
 import cn.com.wanshi.chat.common.utils.SerialNoUtil;
-import cn.com.wanshi.chat.friendship.entity.ImFriendshipRequest;
+import cn.com.wanshi.chat.group.entity.ImGroup;
 import cn.com.wanshi.chat.group.entity.ImGroupMember;
+import cn.com.wanshi.chat.group.mapper.ImGroupMapper;
 import cn.com.wanshi.chat.group.mapper.ImGroupMemberMapper;
 import cn.com.wanshi.chat.group.model.req.GroupMemberAddReq;
 import cn.com.wanshi.chat.group.model.req.GroupMemberListReq;
 import cn.com.wanshi.chat.group.model.req.GroupMemberRemoveReq;
+import cn.com.wanshi.chat.group.model.resp.GroupInitResp;
 import cn.com.wanshi.chat.group.model.resp.GroupMemberAddResp;
 import cn.com.wanshi.chat.group.model.resp.GroupMemberRemoveResp;
 import cn.com.wanshi.chat.group.model.resp.GroupMemberResp;
@@ -24,9 +29,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +56,23 @@ public class ImGroupMemberServiceImpl extends ServiceImpl<ImGroupMemberMapper, I
     private IImUserDataService imUserService;
 
 
+
+    @Value("${minio.endpoint}")
+    private String minioHost;
+
+
+    @Autowired
+    private ImGroupMapper imGroupMapper;
+
+    @Value("${minio.bucket-name}")
+    private String bucketName;
+
+
+    @Autowired
+    MinioUtil minioUtil;
+
+
+
     @Override
     public List<ImGroupMember> getImgroupMembersByGroupId(String groupId) {
         List<ImGroupMember> imGroupMembers = General.GROUP_TO_MEMBERS_MAP.get(groupId);
@@ -59,6 +83,7 @@ public class ImGroupMemberServiceImpl extends ServiceImpl<ImGroupMemberMapper, I
         LambdaQueryWrapper<ImGroupMember> lqw = new LambdaQueryWrapper<>();
         lqw.eq(ImGroupMember::getGroupId, groupId);
         lqw.eq(ImGroupMember::getLeaveFlag, YesNoEnum.NO.value);
+        lqw.orderByAsc(ImGroupMember::getCreateTime);
         List<ImGroupMember> list = this.list(lqw);
         General.GROUP_TO_MEMBERS_MAP.put(groupId, list);
         return list;
@@ -77,7 +102,7 @@ public class ImGroupMemberServiceImpl extends ServiceImpl<ImGroupMemberMapper, I
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public ResponseVO<GroupMemberRemoveResp> groupMemberRemove(GroupMemberRemoveReq req) {
+    public ResponseVO<GroupMemberRemoveResp> groupMemberRemove(GroupMemberRemoveReq req) throws Exception {
         Date now = new Date();
         LambdaQueryWrapper<ImGroupMember> lqw = new LambdaQueryWrapper<>();
         lqw.eq(ImGroupMember::getGroupId, req.getGroupId());
@@ -88,12 +113,14 @@ public class ImGroupMemberServiceImpl extends ServiceImpl<ImGroupMemberMapper, I
         imGroupMember.setLeaveTime(now);
         boolean update = this.update(imGroupMember, lqw);
         General.GROUP_TO_MEMBERS_MAP.remove(req.getGroupId());
-        return ResponseVO.successResponse();
+        GroupInitResp groupInitResp = this.updateGroupNameAndPhoto(req.getGroupId());
+        GroupMemberRemoveResp result = BeanCopyUtils.copy(groupInitResp, GroupMemberRemoveResp.class);
+        return ResponseVO.successResponse(result);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public ResponseVO<GroupMemberAddResp> groupMemberAdd(GroupMemberAddReq req) {
+    public ResponseVO<GroupMemberAddResp> groupMemberAdd(GroupMemberAddReq req) throws Exception {
         Date now = new Date();
         LambdaQueryWrapper<ImGroupMember> lqw = new LambdaQueryWrapper<>();
         lqw.eq(ImGroupMember::getGroupId, req.getGroupId());
@@ -113,6 +140,8 @@ public class ImGroupMemberServiceImpl extends ServiceImpl<ImGroupMemberMapper, I
 
         if(CollectionUtil.isEmpty(needAddMemberIds)){
             General.GROUP_TO_MEMBERS_MAP.remove(req.getGroupId());
+            GroupInitResp groupInitResp = this.updateGroupNameAndPhoto(req.getGroupId());
+            GroupMemberRemoveResp result = BeanCopyUtils.copy(groupInitResp, GroupMemberRemoveResp.class);
             return ResponseVO.successResponse();
         }
         List<ImUserData> usersByUserIds = imUserService.getUsersByUserIds(needAddMemberIds);
@@ -138,6 +167,53 @@ public class ImGroupMemberServiceImpl extends ServiceImpl<ImGroupMemberMapper, I
 
         //删除缓存
         General.GROUP_TO_MEMBERS_MAP.remove(req.getGroupId());
-        return ResponseVO.successResponse();
+        GroupInitResp groupInitResp = this.updateGroupNameAndPhoto(req.getGroupId());
+        GroupMemberRemoveResp result = BeanCopyUtils.copy(groupInitResp, GroupMemberRemoveResp.class);
+        return ResponseVO.successResponse(groupInitResp);
     }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public GroupInitResp updateGroupNameAndPhoto(String groupId) throws Exception {
+        LambdaQueryWrapper<ImGroup> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(ImGroup::getGroupId, groupId);
+        lqw.eq(ImGroup::getStatus, GroupStatusEnum.NORMAL.getValue());
+
+        ImGroup imGroup = imGroupMapper.selectOne(lqw);
+
+        List<ImGroupMember> groupMembers = this.getImgroupMembersByGroupId(groupId);
+
+        if(imGroup.getCustomNameFlag().equals(YesNoEnum.NO.value)){
+            imGroup.setGroupName("群聊("+ groupMembers.size() +")");
+        }
+
+        List<String> imageList = groupMembers.stream().limit(9).map(m -> {
+            return minioHost +"/" + m.getPhoto();
+        }).collect(Collectors.toList());
+        InputStream combinationOfheadInputStream = ImageUtil.getCombinationOfheadInputStream(imageList);
+
+        String[] s = imGroup.getPhoto().split("_");
+        int picIndex = 0;
+        minioUtil.removeObject(bucketName, imGroup.getPhoto());
+        if(s.length > 1){
+            String[] split = s[1].split("\\.");
+            picIndex = Integer.parseInt(split[0]);
+            picIndex = picIndex + 1;
+        }
+        String photoUrl = imGroup.getGroupId() + "_" + picIndex;
+
+        minioUtil.putObject(bucketName, photoUrl + ".jpg", combinationOfheadInputStream, combinationOfheadInputStream.available(), "image/jpeg");
+        photoUrl = bucketName + "/"+ photoUrl + ".jpg";
+        imGroup.setPhoto(photoUrl);
+
+        imGroupMapper.updateById(imGroup);
+        return GroupInitResp.builder()
+                .groupId(imGroup.getGroupId())
+                .groupName(imGroup.getGroupName())
+                .photo(imGroup.getPhoto())
+                .build();
+    }
+
+
 }

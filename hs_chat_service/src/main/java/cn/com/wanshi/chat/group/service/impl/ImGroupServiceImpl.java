@@ -17,12 +17,14 @@ import cn.com.wanshi.chat.user.entity.ImUserData;
 import cn.com.wanshi.chat.user.service.IImUserDataService;
 import cn.com.wanshi.common.ResponseVO;
 import cn.com.wanshi.common.enums.YesNoEnum;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -87,13 +89,13 @@ public class ImGroupServiceImpl extends ServiceImpl<ImGroupMapper, ImGroup> impl
         }).collect(Collectors.toList());
         InputStream combinationOfheadInputStream = ImageUtil.getCombinationOfheadInputStream(imageList);
 
-        Map<String, ImUserData> userMap = usersByUserIds.stream().collect(Collectors.toMap(ImUserData::getUserId, Function.identity(),
-                (existing, replacement) -> existing));
-
         minioUtil.putObject(bucketName, imGroup.getGroupId() + ".jpg", combinationOfheadInputStream, combinationOfheadInputStream.available(), "image/jpeg");
 
         String photoUrl = bucketName + "/"+ imGroup.getGroupId() + ".jpg";
         imGroup.setPhoto(photoUrl);
+
+        Map<String, ImUserData> userMap = usersByUserIds.stream().collect(Collectors.toMap(ImUserData::getUserId, Function.identity(),
+                (existing, replacement) -> existing));
 
         List<ImGroupMember> groupMembers = req.getGroupMembers().stream().map(item -> {
             ImUserData imUserData = userMap.get(item);
@@ -145,4 +147,6 @@ public class ImGroupServiceImpl extends ServiceImpl<ImGroupMapper, ImGroup> impl
                 .groupId(imGroup.getGroupId())
                 .build());
     }
+
+
 }

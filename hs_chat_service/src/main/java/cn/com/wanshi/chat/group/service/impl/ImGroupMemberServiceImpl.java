@@ -103,7 +103,7 @@ public class ImGroupMemberServiceImpl extends ServiceImpl<ImGroupMemberMapper, I
         if(CollectionUtil.isNotEmpty(list)){
             ImGroupMember imGroupMember = new ImGroupMember();
             imGroupMember.setLeaveFlag(YesNoEnum.NO.value);
-            imGroupMember.setLeaveTime(now);
+            imGroupMember.setLeaveTime(null);
             boolean update = this.update(imGroupMember, lqw);
         }
 

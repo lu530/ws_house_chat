@@ -201,9 +201,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Object> {
                 }else{
                     data.setSendStatus(YesNoEnum.NO.value);
                 }
-                getKafkaTemplate().send(TopicNameConstants.MQ_WS_IM_MESSAGE_TOPIC, JSONObject.toJSONString(data));
             }
         }
+        getKafkaTemplate().send(TopicNameConstants.MQ_WS_IM_MESSAGE_TOPIC, JSONObject.toJSONString(data));
     }
  
     /**

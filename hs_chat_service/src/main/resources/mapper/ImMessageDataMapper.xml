@@ -42,9 +42,9 @@
                 <if test="ownerId != null and ownerId != ''">
                     AND owner_id = #{ownerId}
                 </if>
-                <if test="ownerId != null and ownerId != '' and fromIdNEqOwerIdFlag != null and fromIdNEqOwerIdFlag">
+        <!--        <if test="ownerId != null and ownerId != '' and fromIdNEqOwerIdFlag != null and fromIdNEqOwerIdFlag">
                     AND from_id <![CDATA[ <> ]]>  #{ownerId}
-                </if>
+                </if>-->
             </where>
         group by
             from_id
@@ -58,9 +58,9 @@
                 <if test="ownerId != null and ownerId != ''">
                     AND t1.owner_id = #{ownerId}
                 </if>
-                <if test="ownerId != null and ownerId != '' and fromIdNEqOwerIdFlag != null and fromIdNEqOwerIdFlag">
+              <!--  <if test="ownerId != null and ownerId != '' and fromIdNEqOwerIdFlag != null and fromIdNEqOwerIdFlag">
                     AND t1.from_id <![CDATA[ <> ]]>  #{ownerId}
-                </if>
+                </if>-->
                 and t1.from_type = 1
             </where>
         union

@@ -218,6 +218,7 @@ public class ImMessageDataServiceImpl extends ServiceImpl<ImMessageDataMapper, I
                 m.setFriendNickName(friendResp.getFriendNickName());
                 m.setNickName(friendResp.getNickName());
                 m.setPhoto(friendResp.getPhoto());
+                m.setFromId(friendResp.getUserId());
             }
 
             Date messageTime = m.getMessageTime();
@@ -234,7 +235,7 @@ public class ImMessageDataServiceImpl extends ServiceImpl<ImMessageDataMapper, I
             }
             m.setMessageTimeStr(messageTimeStr);
             return m;
-        }).sorted(Comparator.comparing(ImFriendMessagesResp::getMessageTime).reversed()).collect(Collectors.toList());
+        }).filter(distinctByKey(ImFriendMessagesResp::getFromId)).sorted(Comparator.comparing(ImFriendMessagesResp::getMessageTime).reversed()).collect(Collectors.toList());
         return ResponseVO.successResponse(list);
     }
 

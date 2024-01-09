@@ -2,13 +2,8 @@ package cn.com.wanshi.chat.group.controller;
 
 
 import cn.com.wanshi.chat.common.annotation.ValidateToken;
-import cn.com.wanshi.chat.group.model.req.GroupInitReq;
-import cn.com.wanshi.chat.group.model.req.GroupMemberListReq;
-import cn.com.wanshi.chat.group.model.req.GroupMemberRemoveReq;
-import cn.com.wanshi.chat.group.model.resp.GroupInitResp;
-import cn.com.wanshi.chat.group.model.resp.GroupMemberAddResp;
-import cn.com.wanshi.chat.group.model.resp.GroupMemberRemoveResp;
-import cn.com.wanshi.chat.group.model.resp.GroupMemberResp;
+import cn.com.wanshi.chat.group.model.req.*;
+import cn.com.wanshi.chat.group.model.resp.*;
 import cn.com.wanshi.chat.group.service.IImGroupMemberService;
 import cn.com.wanshi.chat.group.service.IImGroupService;
 import cn.com.wanshi.common.ResponseVO;
@@ -19,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import cn.com.wanshi.chat.group.model.req.GroupMemberAddReq;
 
 import java.util.List;
 
@@ -49,6 +43,23 @@ public class ImGroupController {
     @ValidateToken
     public ResponseVO<GroupInitResp> groupInit(@RequestBody @Validated GroupInitReq req) throws Exception {
         ResponseVO<GroupInitResp> result = iImGroupService.groupInit(req);
+        return result;
+    }
+
+    @ApiOperation("群信息")
+    @PostMapping("/info")
+    @ValidateToken
+    public ResponseVO<GroupInfoResp> groupInfo(@RequestBody @Validated GroupInfoReq req) throws Exception {
+        ResponseVO<GroupInfoResp> result = iImGroupService.groupInfo(req);
+        return result;
+    }
+
+
+    @ApiOperation("群名称修改")
+    @PostMapping("/groupName/modify")
+    @ValidateToken
+    public ResponseVO<Boolean> groupNameModify(@RequestBody @Validated GroupNameModifyReq req) throws Exception {
+        ResponseVO<Boolean> result = iImGroupService.groupNameModify(req);
         return result;
     }
 

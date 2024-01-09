@@ -2,13 +2,17 @@ package cn.com.wanshi.chat.group.service.impl;
 
 import cn.com.wanshi.chat.common.constants.CommonConstants;
 import cn.com.wanshi.chat.common.enums.*;
+import cn.com.wanshi.chat.common.utils.BeanCopyUtils;
 import cn.com.wanshi.chat.common.utils.ImageUtil;
 import cn.com.wanshi.chat.common.utils.MinioUtil;
 import cn.com.wanshi.chat.common.utils.SerialNoUtil;
 import cn.com.wanshi.chat.group.entity.ImGroup;
 import cn.com.wanshi.chat.group.entity.ImGroupMember;
 import cn.com.wanshi.chat.group.mapper.ImGroupMapper;
+import cn.com.wanshi.chat.group.model.req.GroupInfoReq;
 import cn.com.wanshi.chat.group.model.req.GroupInitReq;
+import cn.com.wanshi.chat.group.model.req.GroupNameModifyReq;
+import cn.com.wanshi.chat.group.model.resp.GroupInfoResp;
 import cn.com.wanshi.chat.group.model.resp.GroupInitResp;
 import cn.com.wanshi.chat.group.service.IImGroupService;
 import cn.com.wanshi.chat.message.entity.ImMessageData;
@@ -109,7 +113,6 @@ public class ImGroupServiceImpl extends ServiceImpl<ImGroupMapper, ImGroup> impl
             groupMember.setJoinType(GroupJoinTypeEnum.FRIEND_RECOMMEND.getValue());
             groupMember.setRole(GroupRoleEnum.NORMAL.getValue());
             groupMember.setCreateTime(now);
-
             return groupMember;
         }).collect(Collectors.toList());
 
@@ -146,6 +149,28 @@ public class ImGroupServiceImpl extends ServiceImpl<ImGroupMapper, ImGroup> impl
                 .photo(photoUrl)
                 .groupId(imGroup.getGroupId())
                 .build());
+    }
+
+    @Override
+    public ResponseVO<GroupInfoResp> groupInfo(GroupInfoReq req) {
+        LambdaQueryWrapper<ImGroup> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(ImGroup::getGroupId, req.getGroupId());
+        ImGroup one = this.getOne(lqw);
+        GroupInfoResp result = BeanCopyUtils.copy(one, GroupInfoResp.class);
+        return ResponseVO.successResponse(result);
+    }
+
+    @Override
+    public ResponseVO<Boolean> groupNameModify(GroupNameModifyReq req) {
+        LambdaQueryWrapper<ImGroup> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(ImGroup::getGroupId, req.getGroupId());
+
+        ImGroup imGroup = new ImGroup();
+        imGroup.setGroupName(req.getGroupName());
+        imGroup.setCustomNameFlag(YesNoEnum.YES.value);
+
+        this.update( imGroup, lqw);
+        return ResponseVO.successResponse(true);
     }
 
 

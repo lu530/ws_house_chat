@@ -28,4 +28,7 @@ public interface IImFriendshipService extends IService<ImFriendship> {
      * @return
      */
     ResponseVO<List<FriendResp>> friends(FriendsReq req);
+
+
+    List<FriendResp> getFriendList(String userId);
 }

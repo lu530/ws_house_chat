@@ -1,7 +1,10 @@
 package cn.com.wanshi.chat.group.service;
 
 import cn.com.wanshi.chat.group.entity.ImGroup;
+import cn.com.wanshi.chat.group.model.req.GroupInfoReq;
 import cn.com.wanshi.chat.group.model.req.GroupInitReq;
+import cn.com.wanshi.chat.group.model.req.GroupNameModifyReq;
+import cn.com.wanshi.chat.group.model.resp.GroupInfoResp;
 import cn.com.wanshi.chat.group.model.resp.GroupInitResp;
 import cn.com.wanshi.common.ResponseVO;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -21,7 +24,7 @@ public interface IImGroupService extends IService<ImGroup> {
     ResponseVO<GroupInitResp> groupInit(GroupInitReq req) throws IOException, Exception;
 
 
+    ResponseVO<GroupInfoResp> groupInfo(GroupInfoReq req);
 
-
-
+    ResponseVO<Boolean> groupNameModify(GroupNameModifyReq req);
 }

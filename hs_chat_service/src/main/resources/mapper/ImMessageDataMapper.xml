@@ -27,10 +27,10 @@
             parameterType="cn.com.wanshi.chat.message.model.req.ImFriendMessagesReq">
         select
             t1.*,
-            u.nick_name,
-            u.account,
-            u.photo,
-            if2.friend_nick_name
+            "" as nick_name,
+            "" as account,
+            "" as photo,
+            "" as friend_nick_name
             from
             im_message_data t1
             join (
@@ -50,10 +50,6 @@
             from_id
             ) t2 on
             t1.message_time = t2.message_time
-            join im_friendship if2
-            on t1.from_id = if2.to_id and  t1.to_id = if2.from_id
-            join im_user_data u
-            on t1.from_id = u.user_id
             <where>
                 <if test="ownerId != null and ownerId != ''">
                     AND t1.owner_id = #{ownerId}

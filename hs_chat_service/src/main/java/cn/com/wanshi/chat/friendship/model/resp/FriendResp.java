@@ -37,6 +37,9 @@ public class FriendResp {
     @ApiModelProperty(value = "用户名称")
     private String nickName;
 
+    @ApiModelProperty(value = "好友备注名称")
+    private String friendNickName;
+
     @ApiModelProperty(value = "邮箱地址")
     private String email;
 

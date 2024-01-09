@@ -118,10 +118,14 @@ public class ImFriendshipServiceImpl extends ServiceImpl<ImFriendshipMapper, ImF
 
     @Override
     public ResponseVO<List<FriendResp>> friends(FriendsReq req) {
+        return ResponseVO.successResponse(getFriendList(req.getUserId()));
+    }
 
+    @Override
+    public List<FriendResp> getFriendList(String userId){
         //接受方好友关系保存
         LambdaQueryWrapper<ImFriendship> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(ImFriendship::getFromId, req.getUserId());
+        lqw.eq(ImFriendship::getFromId, userId);
         lqw.eq(ImFriendship::getBlack, FriendshipBlackEnum.NORMAL.getValue());
         lqw.eq(ImFriendship::getStatus, FriendshipStatusEnum.NORMAL.getValue());
 
@@ -143,8 +147,9 @@ public class ImFriendshipServiceImpl extends ServiceImpl<ImFriendshipMapper, ImF
             BeanUtils.copyProperties(imUserData, friendResp);
             return friendResp;
         }).collect(Collectors.toList());
-        return ResponseVO.successResponse(collect);
+        return  collect;
     }
+
 
 
 }

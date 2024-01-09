@@ -5,8 +5,11 @@ import cn.com.wanshi.chat.common.constants.General;
 import cn.com.wanshi.chat.common.enums.MessageFromUserTypeEnum;
 import cn.com.wanshi.chat.common.enums.MessageToUserTypeEnum;
 import cn.com.wanshi.chat.common.enums.MessageTypeEnum;
+import cn.com.wanshi.chat.friendship.entity.ImFriendship;
 import cn.com.wanshi.chat.friendship.entity.ImFriendshipRequest;
 import cn.com.wanshi.chat.friendship.model.resp.FriendRequestCountResp;
+import cn.com.wanshi.chat.friendship.model.resp.FriendResp;
+import cn.com.wanshi.chat.friendship.service.IImFriendshipService;
 import cn.com.wanshi.chat.group.entity.ImGroupMember;
 import cn.com.wanshi.chat.message.entity.ImMessageData;
 import cn.com.wanshi.chat.message.mapper.ImMessageDataMapper;
@@ -54,6 +57,10 @@ public class ImMessageDataServiceImpl extends ServiceImpl<ImMessageDataMapper, I
 
     @Autowired
     private IImUserDataService imUserDataService;
+
+
+    @Autowired
+    private IImFriendshipService iImFriendshipService;
 
 
     /**
@@ -196,7 +203,23 @@ public class ImMessageDataServiceImpl extends ServiceImpl<ImMessageDataMapper, I
     public ResponseVO<List<ImFriendMessagesResp>> friendMessages(ImFriendMessagesReq req) {
         List<ImFriendMessagesResp> list = imMessageDataMapper.friendMessages(req);
         Date now = new Date();
+        List<FriendResp> friendList = iImFriendshipService.getFriendList(req.getUserId());
+        Map<String, FriendResp> friendDateGroupByUserId = friendList.stream().collect(Collectors.toMap(FriendResp::getUserId, Function.identity(),
+                (existing, replacement) -> existing));
         list = list.stream().filter(distinctByKey(ImFriendMessagesResp::getFromId)).map(m -> {
+            if(m.getFromType().equals(MessageFromUserTypeEnum.NORMAL_USER.getType())){
+                FriendResp friendResp ;
+
+                if(!m.getFromId().equals(req.getUserId())){
+                     friendResp = friendDateGroupByUserId.get(m.getFromId());
+                }else{
+                    friendResp = friendDateGroupByUserId.get(m.getToId());
+                }
+                m.setFriendNickName(friendResp.getFriendNickName());
+                m.setNickName(friendResp.getNickName());
+                m.setPhoto(friendResp.getPhoto());
+            }
+
             Date messageTime = m.getMessageTime();
             int messageTimedd = Integer.parseInt(DateUtil.getDateString(messageTime, "dd"));
             int dd = Integer.parseInt(DateUtil.getDateString(now, "dd"));

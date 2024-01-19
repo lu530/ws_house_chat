@@ -81,3 +81,28 @@ minio:
 netty:
   hostname: 10.11.18.41
   port: 7777
+
+
+ko-time:
+  # 需要监测的切面范围，参考aop的@pointcut 或者左侧常见问题
+  pointcut: execution(public * cn.com.wanshi.chat..*.*(..))
+  # 是否开启koTime，默认开启，当为false时，关闭koTimeq
+  enable: true
+  # 是否开启控制输出，默认false
+  log-enable: false
+  # 控制台输出语言（english/chinese）默认chinese
+  log-language: chinese
+  # 时间阈值，用于前端展示，大于阈值显示红色，小于阈值显示绿色，默认800
+  threshold: 800.0
+  # 前端页面调用接口的上下文环境，无法自动获取时可手动配置，一般情况切记不要配置   v2.0.1开始支持
+  exception-enable: true
+  # 是否开启认证，默认为false,开启后需要登录才能访问调用链路 v2.0.2开始支持
+  auth-enable: true
+  # 登录用户 v2.0.2开始支持
+  user-name: admin
+  # 登录密码 v2.0.2开始支持
+  password: 123456
+  # 是否开启入参组合分析 默认开启 v2.0.8开始支持 双击方法节点即可看到效果
+  param-analyse: true
+  # 调用信息存储线程数（为了不影响项目本身性能，链路存储异步进行），默认2，该值并非越大越好，瓶颈取决于数据库性能和服务器配置，尽可能少占用项目资源为上  v2.2.0-BETA开始支持
+  thread-num: 2
